@@ -99,8 +99,16 @@ public class ViewerPanel3D extends OpenGLPanel
 		    background(0, 0, 0);	
 	}	
 	
+	/**
+	 * Animates stuff
+	 */
+	public void animate(){
+		
+	}
 	
 	public void draw() {
+		//animate before drawing
+		animate();
 		
 		GL2 gl=getGL2();
 		
