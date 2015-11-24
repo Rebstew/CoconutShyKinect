@@ -42,8 +42,8 @@ public class AugmentedRealityApplet extends DWApplet
 	public void init()
 	{
 		createMainFrame("Augmented Reality App");
-    	AugmentedRealityApp.app=new AugmentedRealityApp();
-    	setFrameSize(730,570,null);
+		AugmentedRealityApp.app=new AugmentedRealityApp();
+		setFrameSize(730,570,null);
 	}
 }
 

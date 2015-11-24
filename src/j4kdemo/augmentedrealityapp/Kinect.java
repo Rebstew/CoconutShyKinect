@@ -42,16 +42,16 @@ import edu.ufl.digitalworlds.j4k.Skeleton;
 public class Kinect extends J4KSDK{
 
 	ViewerPanel3D viewer=null;
-	
+
 	public Kinect()
 	{
 		super();
 	}
-	
-	
+
+
 	public void setViewer(ViewerPanel3D viewer){this.viewer=viewer;}
-	
-	
+
+
 	@Override
 	public void onDepthFrameEvent(short[] depth, byte[] player_index, float[] XYZ, float[] UV) {
 		if(viewer==null)return;
@@ -66,8 +66,8 @@ public class Kinect extends J4KSDK{
 	public void onSkeletonFrameEvent(boolean[] flags, float[] positions, float[] orientations, byte[] joint_status) {
 		if(viewer==null || viewer.skeletons==null)return;
 		for(int i=0;i<getMaxNumberOfSkeletons();i++)
-		viewer.skeletons[i]=Skeleton.getSkeleton(i, flags, positions,orientations, joint_status,this);
-		
+			viewer.skeletons[i]=Skeleton.getSkeleton(i, flags, positions,orientations, joint_status,this);
+
 	}
 
 	@Override
