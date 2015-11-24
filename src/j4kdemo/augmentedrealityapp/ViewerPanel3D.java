@@ -51,7 +51,7 @@ import edu.ufl.digitalworlds.j4k.VideoFrame;
 public class ViewerPanel3D extends OpenGLPanel
 {
 	private float view_rotx = 0.0f, view_roty = 0.0f, view_rotz = 0.0f;
-	private int prevMouseX, prevMouseY;
+//	private int prevMouseX, prevMouseY;
 
 	DepthMap current_map=null;
 
@@ -62,13 +62,15 @@ public class ViewerPanel3D extends OpenGLPanel
 	OpenGLTexture xray;
 	OpenGLTexture box;
 
-	int mode=5;
+	int mode=5; /* mode 3: squelette + profondeur
+					mode4: squelette
+					mode 5: caisse */
+	
 	float mem_sk[];
 
 	public void setup()
 	{
 		mem_sk=new float[25*3];
-		xray=new OpenGLTexture("data/xray.png");
 		box=new OpenGLTexture("data/box.png");
 
 		//OPENGL SPECIFIC INITIALIZATION (OPTIONAL)
@@ -99,18 +101,11 @@ public class ViewerPanel3D extends OpenGLPanel
 		background(0, 0, 0);	
 	}	
 
-	/**
-	 * Animates stuff
-	 */
-	public void animate(){
-		
-	}
-	
+
 	public void draw() {
-		//animate before drawing
-		animate();
-		
-		GL2 gl = getGL2();
+
+		GL2 gl=getGL2();
+
 
 		pushMatrix();
 
@@ -124,7 +119,7 @@ public class ViewerPanel3D extends OpenGLPanel
 
 		if(map!=null) 
 		{
-			if(mode==0 || mode==1 || mode==2 || mode==3 || mode==4 || mode==5)
+			if(mode==3 || mode==4 || mode==5)
 			{
 				gl.glDisable(GL2.GL_LIGHTING);
 				gl.glEnable(GL2.GL_TEXTURE_2D);
@@ -134,40 +129,8 @@ public class ViewerPanel3D extends OpenGLPanel
 				gl.glDisable(GL2.GL_TEXTURE_2D);
 			}
 
-			if(mode==1)
-			{
-				gl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
-				gl.glEnable(GL2.GL_TEXTURE_2D);
-				xray.use(gl);
-				pushMatrix();
-				translate(0,0.05,-3);
-				image(0.8,2.1);
-				popMatrix();
-				gl.glDisable(GL2.GL_TEXTURE_2D);
-				gl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
 
-				gl.glColorMask(false,false,false,false);
-				color(1,0,0);
-				pushMatrix();
-				translate(-0.55,0,-0.4);
-				rect(1,1);
-				popMatrix();
-				pushMatrix();
-				translate(+0.55,0,-0.4);
-				rect(1,1);
-				popMatrix();
-				pushMatrix();
-				translate(0,0.63,-0.4);
-				rect(1,1);
-				popMatrix();
-				pushMatrix();
-				translate(0,-0.63,-0.4);
-				rect(1,1);
-				popMatrix();
-				gl.glColorMask(true,true,true,true);
-			}
-
-			if(mode==1 || mode==2 || mode==3)
+			if(mode==3)
 			{
 				gl.glEnable(GL2.GL_LIGHTING);
 				gl.glDisable(GL2.GL_TEXTURE_2D);
@@ -179,13 +142,13 @@ public class ViewerPanel3D extends OpenGLPanel
 
 		if(mode==3 || mode==4 || mode==5)
 		{
-			if(mode==3||mode==4||mode==5)gl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
+			gl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
 
 			gl.glDisable(GL2.GL_LIGHTING);
 			gl.glLineWidth(2);
 			gl.glColor3f(1f,0f,0f);
 			boolean found=false;
-			for(int i=0;i<6 && !found;i++)
+			for(int i=0;i<6 && !found;i++){
 				if(skeletons[i]!=null) 
 				{
 					if(skeletons[i].isTracked())
@@ -200,6 +163,7 @@ public class ViewerPanel3D extends OpenGLPanel
 						skeletons[i].increaseTimesDrawn();
 					}
 				}
+			}
 		}
 
 		if(mode==5)
@@ -215,7 +179,7 @@ public class ViewerPanel3D extends OpenGLPanel
 			pushMatrix();
 			gl.glLoadIdentity();
 			gl.glMultMatrixd(transf,0);
-			gl.glScaled(s,s,s);
+//			gl.glScaled(s,s,s);
 			/*gl.glBegin(GL2.GL_LINES);
 			gl.glColor3f(0,0,0);gl.glVertex3d(-0.5f,0,0);gl.glColor3f(1,0,0);gl.glVertex3d(0.5f,0,0);
 			gl.glColor3f(0,0,0);gl.glVertex3d(0,-0.5f,0);gl.glColor3f(0,1,0);gl.glVertex3d(0,0.5f,0);
@@ -270,43 +234,44 @@ public class ViewerPanel3D extends OpenGLPanel
 	}
 
 
-	public void mouseDragged(int x, int y, MouseEvent e) {
-
-		//Dimension size = e.getComponent().getSize();
-
-
-		if(isMouseButtonPressed(3)||isMouseButtonPressed(1))
-		{
-			//float thetaY = 360.0f * ( (float)(x-prevMouseX)/(float)size.width);
-			//float thetaX = 360.0f * ( (float)(prevMouseY-y)/(float)size.height);
-			//view_rotx -= thetaX;
-			//view_roty += thetaY;		
-		}
-
-		prevMouseX = x;
-		prevMouseY = y;
-
-	}
-
-	public void mousePressed(int x, int y, MouseEvent e) {
-		prevMouseX = x;
-		prevMouseY = y;
-	}
+//	public void mouseDragged(int x, int y, MouseEvent e) {
+//
+//		//Dimension size = e.getComponent().getSize();
+//
+//
+//		if(isMouseButtonPressed(3)||isMouseButtonPressed(1))
+//		{
+//			//float thetaY = 360.0f * ( (float)(x-prevMouseX)/(float)size.width);
+//			//float thetaX = 360.0f * ( (float)(prevMouseY-y)/(float)size.height);
+//			//view_rotx -= thetaX;
+//			//view_roty += thetaY;		
+//		}
+//
+//		prevMouseX = x;
+//		prevMouseY = y;
+//
+//	}
+//
+//	public void mousePressed(int x, int y, MouseEvent e) {
+//		prevMouseX = x;
+//		prevMouseY = y;
+//	}
 
 	public void keyPressed(char keyChar, KeyEvent e)
 	{
 		if(e.getKeyCode()==33)//page up
 		{
 			mode+=1;
-			if(mode>5)mode=0;
+			if(mode>5)mode=3;
 
 		}
 		else if(e.getKeyCode()==34)//page down
 		{
 			mode-=1;
-			if(mode<0) mode=5;
+			if(mode<3) mode=5;
 		}
 
 	}
 
 }
+>>>>>>> branch 'master' of https://github.com/Webster56/CoconutShyKinect.git
