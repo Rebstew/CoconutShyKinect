@@ -1,17 +1,24 @@
 package tridmodels;
 
+/**
+ * Represents a 3d model, with collision
+ * @author Steven
+ *
+ */
 public class Model {
 
-	private Point position, speed, acceleration;
+	private Vector position, speed, acceleration;
 	private Asset drawingModel;
 	private BoundingBox boundingBox;
+	private double weight;
 	
-	public Model(Point position, Asset model){
+	public Model(Vector position, Asset model, double weight){
 		this.position = position;
 		this.drawingModel = model;
-		this.speed = new Point(0,0,0);
-		this.acceleration = new Point(0,0,0);
+		this.speed = new Vector(0,0,0);
+		this.acceleration = new Vector(0,0,0);
 		this.boundingBox = new BoundingBox(model);
+		this.setWeight(weight);
 	}
 	
 	/**
@@ -29,28 +36,37 @@ public class Model {
 				&& boundingBox.maxZ > boundingBox2.minZ
 				&& boundingBox.minZ < boundingBox2.maxZ);
 	}
+	
+	/**
+	 * Returns 3d angle of the collision between this and another model
+	 * @param anotherModel
+	 * @return
+	 */
+	public double getCollisionAngleWith(Model anotherModel){
+		return position.angleWith(anotherModel.position);
+	}
 
-	public Point getPosition() {
+	public Vector getPosition() {
 		return position;
 	}
 
-	public void setPosition(Point position) {
+	public void setPosition(Vector position) {
 		this.position = position;
 	}
 
-	public Point getSpeed() {
+	public Vector getSpeed() {
 		return speed;
 	}
 
-	public void setSpeed(Point speed) {
+	public void setSpeed(Vector speed) {
 		this.speed = speed;
 	}
 
-	public Point getAcceleration() {
+	public Vector getAcceleration() {
 		return acceleration;
 	}
 
-	public void setAcceleration(Point acceleration) {
+	public void setAcceleration(Vector acceleration) {
 		this.acceleration = acceleration;
 	}
 
@@ -68,6 +84,14 @@ public class Model {
 
 	public void setBoundingBox(BoundingBox boundingBox) {
 		this.boundingBox = boundingBox;
+	}
+
+	public double getWeight() {
+		return weight;
+	}
+
+	public void setWeight(double weight) {
+		this.weight = weight;
 	}
 	
 }
