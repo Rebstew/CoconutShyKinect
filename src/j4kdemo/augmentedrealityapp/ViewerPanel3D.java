@@ -54,7 +54,7 @@ import edu.ufl.digitalworlds.j4k.VideoFrame;
 public class ViewerPanel3D extends OpenGLPanel
 {
 	private float view_rotx = 0.0f, view_roty = 0.0f, view_rotz = 0.0f;
-//	private int prevMouseX, prevMouseY;
+	//	private int prevMouseX, prevMouseY;
 
 	DepthMap current_map=null;
 
@@ -68,7 +68,7 @@ public class ViewerPanel3D extends OpenGLPanel
 	int mode=5; /* mode 3: squelette + profondeur
 					mode4: squelette
 					mode 5: caisse */
-	
+
 	float mem_sk[];
 
 	public void setup()
@@ -101,14 +101,13 @@ public class ViewerPanel3D extends OpenGLPanel
 
 		videoTexture=new VideoFrame();
 
-		background(255, 0, 255);	
+		background(0, 0, 0);	
 	}	
 
 
 	public void draw() {
 
 		GL2 gl=getGL2();
-
 
 		pushMatrix();
 
@@ -120,164 +119,131 @@ public class ViewerPanel3D extends OpenGLPanel
 
 		DepthMap map=current_map;
 
+		background(gl);
+
 		if(map!=null) 
 		{
-			gl.glDisable(GL2.GL_LIGHTING);
-			gl.glEnable(GL2.GL_TEXTURE_2D);
-			gl.glColor3f(1f,1f,1f);
-			videoTexture.use(gl);
-			map.drawTexture(gl);
-			gl.glDisable(GL2.GL_TEXTURE_2D);
-
 			if(mode==3)
 			{
 				gl.glEnable(GL2.GL_LIGHTING);
-//				gl.glDisable(GL2.GL_TEXTURE_2D);
-				gl.glEnable(GL2.GL_TEXTURE_2D);
+				gl.glDisable(GL2.GL_TEXTURE_2D);
 				gl.glColor3f(0.9f,0.9f,0.9f);
 				map.maskPlayers();
-				videoTexture.use(gl);
-				map.drawTexture(gl);
+				map.drawNormals(gl);
 				gl.glDisable(GL2.GL_TEXTURE_2D);
 			}
 		}    
 
-		if(mode==3 || mode==4 || mode==5)
-		{
-			gl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
+		gl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
 
-			gl.glDisable(GL2.GL_LIGHTING);
-			gl.glLineWidth(2);
-			gl.glColor3f(1f,0f,0f);
-			boolean found=false;
-			for(int i=0;i<6 && !found;i++){
-				if(skeletons[i]!=null) 
+		gl.glDisable(GL2.GL_LIGHTING);
+		gl.glLineWidth(2);
+		gl.glColor3f(1f,0f,0f);
+		boolean found=false;
+		for(int i=0;i<6 && !found;i++){
+			if(skeletons[i]!=null) 
+			{
+				if(skeletons[i].isTracked())
 				{
-					if(skeletons[i].isTracked())
-					{
-						float sk[]=skeletons[i].getJointPositions();
-						for(int j=0;j<sk.length;j++) mem_sk[j]=mem_sk[j]*0.8f+sk[j]*0.2f;
-						found=true;
-					}	
-					if((mode==3 || mode==4) && skeletons[i].getTimesDrawn()<=10 && skeletons[i].isTracked())
-					{
-						skeletons[i].draw(gl);
-						skeletons[i].increaseTimesDrawn();
-					}
+					float sk[]=skeletons[i].getJointPositions();
+					for(int j=0;j<sk.length;j++) mem_sk[j]=mem_sk[j]*0.8f+sk[j]*0.2f;
+					found=true;
+				}	
+				if((mode==3 || mode==4) && skeletons[i].getTimesDrawn()<=10 && skeletons[i].isTracked())
+				{
+					skeletons[i].draw(gl);
+					skeletons[i].increaseTimesDrawn();
 				}
 			}
 		}
 
-		if(mode==5)
-		{
-			Skeleton sk=new Skeleton();
-			sk.setJointPositions(mem_sk);
-			double transf[]=Geom.identity4();
-			double inv_transf[]=Geom.identity4();
-			
-			//transformations à effectuer pour suivre la main
-			double nrm[]=sk.getTorsoOrientation();
-			double hr[]=sk.get3DJoint(Skeleton.WRIST_RIGHT);
-			double kr[]=sk.get3DJoint(Skeleton.HAND_RIGHT);
-			
-			transformBody4(-hr[0],hr[1],-hr[2],
-					       -kr[0],kr[1],-kr[2],
-					       -nrm[0],nrm[1],nrm[2],transf,inv_transf);
-			//fin			
-			
-			pushMatrix();
+		Skeleton sk=new Skeleton();
+		sk.setJointPositions(mem_sk);
+		double transf[]=Geom.identity4();
+		double inv_transf[]=Geom.identity4();
+
+		//transformations à effectuer pour suivre la main
+		double nrm[]=sk.getTorsoOrientation();
+		double hr[]=sk.get3DJoint(Skeleton.WRIST_RIGHT);
+		double kr[]=sk.get3DJoint(Skeleton.HAND_RIGHT);
+
+		transformBody4(-hr[0],hr[1],-hr[2],
+				-kr[0],kr[1],-kr[2],
+				-nrm[0],nrm[1],nrm[2],transf,inv_transf);
+		//fin			
+
+		pushMatrix();
 			gl.glLoadIdentity();
 			gl.glMultMatrixd(transf,0);
 			gl.glScaled(.15,.15,.15);
-
+	
 			rotateY(180);
-
+	
 			pushMatrix();
-			translate(0,0,+0.4);
-			//rotateY(180);
-			color(1,1,1);
-			box.use(gl);
-			image(0.8,0.8);
+				translate(0,0,+0.4);
+				//rotateY(180);
+				color(1,1,1);
+				box.use(gl);
+				image(0.8,0.8);
 			popMatrix();
-
+	
 			pushMatrix();
-			translate(0,0,-0.4);
-			rotateY(180);
-			color(1,1,1);
-			box.use(gl);
-			image(0.8,0.8);
+				translate(0,0,-0.4);
+				rotateY(180);
+				color(1,1,1);
+				box.use(gl);
+				image(0.8,0.8);
 			popMatrix();
-			
+	
 			pushMatrix();
-			translate(+0.4,0,0);
-			rotateY(90);
-			color(1,1,1);
-			box.use(gl);
-			image(0.8,0.8);
+				translate(+0.4,0,0);
+				rotateY(90);
+				color(1,1,1);
+				box.use(gl);
+				image(0.8,0.8);
 			popMatrix();
-
+	
 			pushMatrix();
-			translate(-0.4,0,0);
-			rotateY(-90);
-			color(1,1,1);
-			box.use(gl);
-			image(0.8,0.8);
+				translate(-0.4,0,0);
+				rotateY(-90);
+				color(1,1,1);
+				box.use(gl);
+				image(0.8,0.8);
 			popMatrix();
-
+	
 			pushMatrix();
-			translate(0,-0.4,0);
-			rotateX(90);
-			color(1,1,1);
-			box.use(gl);
-			image(0.8,0.8);
+				translate(0,-0.4,0);
+				rotateX(90);
+				color(1,1,1);
+				box.use(gl);
+				image(0.8,0.8);
 			popMatrix();
-
+	
 			pushMatrix();
-			translate(0,0.4,0);
-			rotateX(-90);
-			color(1,1,1);
-			box.use(gl);
-			image(0.8,0.8);
+				translate(0,0.4,0);
+				rotateX(-90);
+				color(1,1,1);
+				box.use(gl);
+				image(0.8,0.8);
 			popMatrix();
-
+	
 			popMatrix();
-		}
 		popMatrix();
-		background(gl);
-		
+
 	}
 
-	private void background(GL2 gl) {
-		gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
-		gl.glPushMatrix();
-		gl.glOrtho(0, 1, 0, 1, 0, 1);
+	private void background(GL2 gl) {				
+		pushMatrix(); 
 
-		gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
-		gl.glPushMatrix();
-		gl.glLoadIdentity();
-		
-		// No depth buffer writes for background.
-		gl.glDepthMask(false);
-		
+		gl.glDisable(GL2.GL_LIGHTING);
+		gl.glEnable(GL2.GL_TEXTURE_2D);
+		gl.glColor3f(1f,1f,1f);
 		videoTexture.use(gl);
-		//gl.glBindTexture( GL.GL_TEXTURE_2D, videoTexture.getOpenGLTextureID() );
-		gl.glBegin( GL2.GL_QUADS ); {
-		  gl.glTexCoord2f( 0f, 0f );
-		  gl.glVertex2f( 0, 0 );
-		  gl.glTexCoord2f( 0f, 1f );
-		  gl.glVertex2f( 0, 1f );
-		  gl.glTexCoord2f( 1f, 1f );
-		  gl.glVertex2f( 1f, 1f );
-		  gl.glTexCoord2f( 1f, 0f );
-		  gl.glVertex2f( 1f, 0 );
-		} gl.glEnd();
+		translate(0,0,-2.2);
+		rotateZ(180);
+		image(8.0/3.0,2);
 
-		gl.glDepthMask( true );
-
-		gl.glPopMatrix();
-		gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
-		gl.glPopMatrix();
-		gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
+		popMatrix();
 	}
 
 
@@ -296,44 +262,44 @@ public class ViewerPanel3D extends OpenGLPanel
 		}
 
 	}
-	
+
 	private double transformBody4(double joint_id_1_x, double joint_id_1_y, double joint_id_1_z, double joint_id_2_x, double joint_id_2_y, double joint_id_2_z, double normal_x,double normal_y,double normal_z,double[] transf, double[] inv_transf)
 	{
 		double mat[]=Geom.identity4();
 		double inv_mat[]=Geom.identity4();
-		
+
 		double v[]=Geom.vector(joint_id_1_x-joint_id_2_x,joint_id_1_y-joint_id_2_y,joint_id_1_z-joint_id_2_z);
 		double vv[]=Geom.vector(normal_x,normal_y,normal_z);
 		double s=Geom.magnitude(v);
 		v=Geom.normalize(v);
-		
+
 		if(v[1]<0) vv=Geom.vector(normal_x,normal_y,-normal_z);
-		
+
 		double n[]=Geom.normalize(Geom.normal(v,Geom.vector(0,1,0)));
-		
+
 		//Moving the center of our coordinate system to the middle point of the line segment
 		//gl.glTranslated((joint_id_1_x+joint_id_2_x)/2.0, (joint_id_1_y+joint_id_2_y)/2.0, (joint_id_1_z+joint_id_2_z)/2.0);
 		mat=Geom.Mult4(mat, Geom.translate4((joint_id_1_x+joint_id_2_x)/2.0, (joint_id_1_y+joint_id_2_y)/2.0, (joint_id_1_z+joint_id_2_z)/2.0));
 		inv_mat=Geom.Mult4(Geom.translate4(-(joint_id_1_x+joint_id_2_x)/2.0, -(joint_id_1_y+joint_id_2_y)/2.0, -(joint_id_1_z+joint_id_2_z)/2.0),inv_mat);
-		
-		
+
+
 		double b = -Math.acos(v[1]);double c = Math.cos(b);double ac = 1.00 - c;double si = Math.sin(b);
 		//The orientation of the rotated z axis after Rotation 1
 		double nz[]=Geom.vector(n[0] * n[2] * ac + n[1] * si,n[1] * n[2] * ac - n[0] * si,n[2] * n[2] * ac + c);
 		//The orientation of the rotated x axis after Rotation 1
 		double nx[]=Geom.vector(n[0] * n[0] * ac + c,n[1] * n[0] * ac + n[2] * si,n[2] * n[0] * ac -n[1]*si);
-		
-		
+
+
 		//Rotation 1: Moving the Y axis to be parallel to the vector p1-p2
 		//gl.glRotated(b*180.0/3.1416,n[0],n[1],n[2]);
 		mat=Geom.Mult4(mat, Geom.rotate4(b*180.0/3.1416,n[0],n[1],n[2]));
 		inv_mat=Geom.Mult4(Geom.rotate4(-b*180.0/3.1416,n[0],n[1],n[2]),inv_mat);
-		
+
 		//Rotation 2: Moving the object around the Y axis 
 		si=vv[0]*nz[0]+vv[1]*nz[1]+vv[2]*nz[2];
 		c=vv[0]*nx[0]+vv[1]*nx[1]+vv[2]*nx[2];
 		b=Math.sqrt(si*si+c*c);
-		
+
 		//if(v[1]>0)
 		{	//gl.glRotated(90-Math.atan2(si/b,c/b)*180.0/3.1416,0,1,0);
 			mat=Geom.Mult4(mat, Geom.rotate4(90-Math.atan2(si/b,c/b)*180.0/3.1416,0,1,0));
@@ -347,13 +313,13 @@ public class ViewerPanel3D extends OpenGLPanel
 		}*/
 		//gl.glScaled(s,s,s); 
 		//mat=Geom.Mult4(mat, Geom.scale4(s,s,s));
-			
+
 		for(int i=0;i<16;i++)
 		{
 			transf[i]=mat[i];
 			inv_transf[i]=inv_mat[i];
 		}
-		
+
 		return s;
 	}
 

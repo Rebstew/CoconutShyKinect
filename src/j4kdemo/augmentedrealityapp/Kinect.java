@@ -46,6 +46,8 @@ public class Kinect extends J4KSDK{
 	public Kinect()
 	{
 		super();
+		this.setSeatedSkeletonTracking(true);
+		this.setNearMode(true);
 	}
 
 
