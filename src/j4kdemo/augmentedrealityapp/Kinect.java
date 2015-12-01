@@ -56,12 +56,6 @@ public class Kinect extends J4KSDK{
 
 	@Override
 	public void onDepthFrameEvent(short[] depth, byte[] player_index, float[] XYZ, float[] UV) {
-		if(viewer==null)return;
-		DepthMap map=new DepthMap(getDepthWidth(),getDepthHeight(),XYZ);
-		map.setPlayerIndex(depth, player_index);
-		if(UV!=null) map.setUV(UV);
-		map.setMaximumAllowedDeltaZ(5);
-		viewer.current_map=map;
 	}
 
 	@Override

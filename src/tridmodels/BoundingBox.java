@@ -8,8 +8,8 @@ public class BoundingBox {
 
 	public double maxX=0, maxY=0, maxZ=0, minX=0, minY=0, minZ=0;
 	
-	public BoundingBox(Asset asset){
-		for(Point p : asset.getVertices()){
+	public BoundingBox(CPolygone asset){
+		for(CVertex p : asset.getVertice()){
 			if(p.x < minX) minX = p.x;
 			if(p.y < minY) minY = p.y;
 			if(p.z < minZ) minZ = p.z;

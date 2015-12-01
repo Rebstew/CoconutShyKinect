@@ -2,15 +2,15 @@ package tridmodels;
 
 public class Model {
 
-	private Point position, speed, acceleration;
-	private Asset drawingModel;
+	private CVertex position, speed, acceleration;
+	private CPolygone drawingModel;
 	private BoundingBox boundingBox;
 	
-	public Model(Point position, Asset model){
+	public Model(CVertex position, CPolygone model){
 		this.position = position;
 		this.drawingModel = model;
-		this.speed = new Point(0,0,0);
-		this.acceleration = new Point(0,0,0);
+		this.speed = new CVertex(0,0,0);
+		this.acceleration = new CVertex(0,0,0);
 		this.boundingBox = new BoundingBox(model);
 	}
 	
@@ -30,35 +30,35 @@ public class Model {
 				&& boundingBox.minZ < boundingBox2.maxZ);
 	}
 
-	public Point getPosition() {
+	public CVertex getPosition() {
 		return position;
 	}
 
-	public void setPosition(Point position) {
+	public void setPosition(CVertex position) {
 		this.position = position;
 	}
 
-	public Point getSpeed() {
+	public CVertex getSpeed() {
 		return speed;
 	}
 
-	public void setSpeed(Point speed) {
+	public void setSpeed(CVertex speed) {
 		this.speed = speed;
 	}
 
-	public Point getAcceleration() {
+	public CVertex getAcceleration() {
 		return acceleration;
 	}
 
-	public void setAcceleration(Point acceleration) {
+	public void setAcceleration(CVertex acceleration) {
 		this.acceleration = acceleration;
 	}
 
-	public Asset getDrawingModel() {
+	public CPolygone getDrawingModel() {
 		return drawingModel;
 	}
 
-	public void setDrawingModel(Asset drawingModel) {
+	public void setDrawingModel(CPolygone drawingModel) {
 		this.drawingModel = drawingModel;
 	}
 
