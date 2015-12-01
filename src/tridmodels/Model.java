@@ -1,17 +1,25 @@
 package tridmodels;
 
+/**
+ * Represents a 3d model, with collision
+ * @author Steven
+ *
+ */
 public class Model {
 
 	private CVertex position, speed, acceleration;
 	private CPolygone drawingModel;
 	private BoundingBox boundingBox;
-	
-	public Model(CVertex position, CPolygone model){
+	private double weight;
+
+	public Model(CVertex position, CPolygone model,double weight){
 		this.position = position;
 		this.drawingModel = model;
 		this.speed = new CVertex(0,0,0);
 		this.acceleration = new CVertex(0,0,0);
+
 		this.boundingBox = new BoundingBox(model);
+		this.setWeight(weight);
 	}
 	
 	/**
@@ -28,6 +36,15 @@ public class Model {
 				&& boundingBox.minY < boundingBox2.maxY
 				&& boundingBox.maxZ > boundingBox2.minZ
 				&& boundingBox.minZ < boundingBox2.maxZ);
+	}
+	
+	/**
+	 * Returns 3d angle of the collision between this and another model
+	 * @param anotherModel
+	 * @return
+	 */
+	public double getCollisionAngleWith(Model anotherModel){
+		return position.angleWith(anotherModel.position);
 	}
 
 	public CVertex getPosition() {
@@ -68,6 +85,14 @@ public class Model {
 
 	public void setBoundingBox(BoundingBox boundingBox) {
 		this.boundingBox = boundingBox;
+	}
+
+	public double getWeight() {
+		return weight;
+	}
+
+	public void setWeight(double weight) {
+		this.weight = weight;
 	}
 	
 }
