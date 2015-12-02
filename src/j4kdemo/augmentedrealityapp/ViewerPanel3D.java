@@ -7,9 +7,9 @@ import javax.media.opengl.GL2;
 
 import edu.ufl.digitalworlds.math.Geom;
 import edu.ufl.digitalworlds.opengl.OpenGLPanel;
-import edu.ufl.digitalworlds.opengl.OpenGLTexture;
 import tridmodels.Model;
 import tridmodels.Solide;
+import tridmodels.primitives.Vertex;
 import edu.ufl.digitalworlds.j4k.DepthMap;
 import edu.ufl.digitalworlds.j4k.Skeleton;
 import edu.ufl.digitalworlds.j4k.VideoFrame;
@@ -49,32 +49,23 @@ import edu.ufl.digitalworlds.j4k.VideoFrame;
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 @SuppressWarnings("serial")
-public class ViewerPanel3D extends OpenGLPanel
-{
-
-	DepthMap current_map=null;
-
-	VideoFrame videoTexture;
-
-	Skeleton skeletons[];
-
-	OpenGLTexture xray;
-	OpenGLTexture box;
-	
-	Solide model;
+public class ViewerPanel3D extends OpenGLPanel{
 
 	int mode=5; /* mode 3: squelette + profondeur
 					mode4: squelette
 					mode 5: caisse */
+	Model ball;
+	Vector<Model> models;
 
-	float mem_sk[];
+	Skeleton skeleton;
+	double transf[]=Geom.identity4();
+	double inv_transf[]=Geom.identity4();
+
+	DepthMap current_map=null;
+	VideoFrame videoTexture;
 	
-
-	Vector<Model> acteurs;
-
 	public void setup()
 	{
-		mem_sk=new float[25*3];
 
 		//OPENGL SPECIFIC INITIALIZATION (OPTIONAL)
 		GL2 gl=getGL2();
@@ -97,7 +88,7 @@ public class ViewerPanel3D extends OpenGLPanel
 		gl.glColor3f(0.9f,0.9f,0.9f);
 
 
-		skeletons=new Skeleton[6];
+		skeleton=new Skeleton();
 
 		videoTexture=new VideoFrame();
 
@@ -105,9 +96,21 @@ public class ViewerPanel3D extends OpenGLPanel
 		
 		
 		//Chargement des modèles 3D
-		acteurs=new Vector<Model>();
-		acteurs.add(Solide.lireFichierObj("./data/models/sphere.obj"));
-		((Solide)acteurs.get(0)).texturerAvec("./data/baseball.jpg");
+		models=new Vector<Model>();
+		
+		ball=new Model(Solide.lireFichierObj("./data/models/sphere.obj"), new Vertex(), 0);
+		ball.getSolide().texturerAvec("./data/baseball.jpg");
+		
+		Model table=new Model(Solide.lireFichierObj("./data/models/table.obj"), new Vertex(), 0);
+		table.getSolide().texturerAvec("./data/wood.jpg");
+		models.add(table);	
+		
+		//@TODO nombre de cans à gérer
+		Model can=new Model(Solide.lireFichierObj("./data/models/can.obj"), new Vertex(), 0);
+		can.getSolide().texturerAvec("./data/aluminium.jpg");
+		models.add(can);	
+		
+//		ball=can;
 	}	
 
 
@@ -128,61 +131,44 @@ public class ViewerPanel3D extends OpenGLPanel
 		}
 
 		gl.glClear(GL2.GL_DEPTH_BUFFER_BIT);
-		boolean found=false;
-		for(int i=0;i<6 && !found;i++){
-			if(skeletons[i]!=null) 
+		
+
+		//Dessin squelette modes 3 & 4
+		if(skeleton!=null){
+			if((mode==3 || mode==4) && skeleton.getTimesDrawn()<=10 && skeleton.isTracked())
 			{
-				//mise à jour des positions du squelette TODO Déplacer ça dans une boucle d'animation
-				if(skeletons[i].isTracked())
-				{
-					float sk[]=skeletons[i].getJointPositions();
-					for(int j=0;j<sk.length;j++) mem_sk[j]=sk[j];
-					found=true;
-				}
-				//Dessin squelette modes 3 & 4
-				if((mode==3 || mode==4) && skeletons[i].getTimesDrawn()<=10 && skeletons[i].isTracked())
-				{
-					gl.glDisable(GL2.GL_LIGHTING);
-					gl.glLineWidth(2);
-					gl.glColor3f(1f,0f,0f);
-					skeletons[i].draw(gl);
-					skeletons[i].increaseTimesDrawn();
-				}
+				gl.glDisable(GL2.GL_LIGHTING);
+				gl.glLineWidth(3);
+				gl.glColor3f(1f,0f,0f);
+				skeleton.draw(gl);
+				skeleton.increaseTimesDrawn();
 			}
 		}
-		
-		//initialisation d'un squelette à l'aide du tableau des positions TODO Déplacer ça dans une boucle d'animation
-		Skeleton sk=new Skeleton();
-		sk.setJointPositions(mem_sk);
-		double transf[]=Geom.identity4();
-		double inv_transf[]=Geom.identity4();
-
-		//transformations à effectuer pour suivre la main TODO Déplacer ça dans une boucle d'animation
-		double nrm[]=sk.getTorsoOrientation();
-		double hr[]=sk.get3DJoint(Skeleton.WRIST_RIGHT);
-		double kr[]=sk.get3DJoint(Skeleton.HAND_RIGHT);
-
-		transformBody4(-hr[0],hr[1],-hr[2],
-				-kr[0],kr[1],-kr[2],
-				-nrm[0],nrm[1],nrm[2],transf,inv_transf);
-		//fin			
 
 		//dessin scène
-		pushMatrix();
 		
-			gl.glEnable(GL2.GL_LIGHTING);
-			gl.glEnable(gl.GL_TEXTURE_2D);
-			gl.glLoadIdentity();
-			gl.glMultMatrixd(transf,0);
-			gl.glScaled(.05,.05,.05);
-	
-			rotateY(180);
+		gl.glEnable(GL2.GL_LIGHTING);
+		gl.glEnable(GL2.GL_TEXTURE_2D);
+		
+		if(!ball.toAnimate){
+			pushMatrix();
 
-			//dessin acteurs
-			acteurs.get(0).dessine3DObj(gl);
-
-		popMatrix();
-
+				gl.glLoadIdentity();
+				gl.glMultMatrixd(transf,0);
+				gl.glScaled(.05,.05,.05);
+		
+				rotateY(180);
+				ball.dessine3DObj(gl);
+				
+			popMatrix();
+		}else{ //@TODO NE pas oublier d'animer le modèle à partir de ce moment là
+			ball.dessine3DObj(gl);
+		}
+		
+		//dessin acteurs
+		for(Model a:models){
+			a.dessine3DObj(gl);
+		}
 	}
 
 	private void background(GL2 gl) {				
@@ -215,56 +201,4 @@ public class ViewerPanel3D extends OpenGLPanel
 		}
 
 	}
-
-	//Calcul des transformations TODO Déplacer ça dans une boucle d'animation
-	private double transformBody4(double joint_id_1_x, double joint_id_1_y, double joint_id_1_z, double joint_id_2_x, double joint_id_2_y, double joint_id_2_z, double normal_x,double normal_y,double normal_z,double[] transf, double[] inv_transf)
-	{
-		double mat[]=Geom.identity4();
-		double inv_mat[]=Geom.identity4();
-
-		double v[]=Geom.vector(joint_id_1_x-joint_id_2_x,joint_id_1_y-joint_id_2_y,joint_id_1_z-joint_id_2_z);
-		double vv[]=Geom.vector(normal_x,normal_y,normal_z);
-		double s=Geom.magnitude(v);
-		v=Geom.normalize(v);
-
-		if(v[1]<0) vv=Geom.vector(normal_x,normal_y,-normal_z);
-
-		double n[]=Geom.normalize(Geom.normal(v,Geom.vector(0,1,0)));
-
-		//Moving the center of our coordinate system to the middle point of the line segment
-		//gl.glTranslated((joint_id_1_x+joint_id_2_x)/2.0, (joint_id_1_y+joint_id_2_y)/2.0, (joint_id_1_z+joint_id_2_z)/2.0);
-		mat=Geom.Mult4(mat, Geom.translate4((joint_id_1_x+joint_id_2_x)/2.0, (joint_id_1_y+joint_id_2_y)/2.0, (joint_id_1_z+joint_id_2_z)/2.0));
-		inv_mat=Geom.Mult4(Geom.translate4(-(joint_id_1_x+joint_id_2_x)/2.0, -(joint_id_1_y+joint_id_2_y)/2.0, -(joint_id_1_z+joint_id_2_z)/2.0),inv_mat);
-
-
-		double b = -Math.acos(v[1]);double c = Math.cos(b);double ac = 1.00 - c;double si = Math.sin(b);
-		//The orientation of the rotated z axis after Rotation 1
-		double nz[]=Geom.vector(n[0] * n[2] * ac + n[1] * si,n[1] * n[2] * ac - n[0] * si,n[2] * n[2] * ac + c);
-		//The orientation of the rotated x axis after Rotation 1
-		double nx[]=Geom.vector(n[0] * n[0] * ac + c,n[1] * n[0] * ac + n[2] * si,n[2] * n[0] * ac -n[1]*si);
-
-
-		//Rotation 1: Moving the Y axis to be parallel to the vector p1-p2
-		mat=Geom.Mult4(mat, Geom.rotate4(b*180.0/3.1416,n[0],n[1],n[2]));
-		inv_mat=Geom.Mult4(Geom.rotate4(-b*180.0/3.1416,n[0],n[1],n[2]),inv_mat);
-
-		//Rotation 2: Moving the object around the Y axis 
-		si=vv[0]*nz[0]+vv[1]*nz[1]+vv[2]*nz[2];
-		c=vv[0]*nx[0]+vv[1]*nx[1]+vv[2]*nx[2];
-		b=Math.sqrt(si*si+c*c);
-
-		{	//gl.glRotated(90-Math.atan2(si/b,c/b)*180.0/3.1416,0,1,0);
-			mat=Geom.Mult4(mat, Geom.rotate4(90-Math.atan2(si/b,c/b)*180.0/3.1416,0,1,0));
-			inv_mat=Geom.Mult4(Geom.rotate4(-90+Math.atan2(si/b,c/b)*180.0/3.1416,0,1,0),inv_mat);
-		}
-
-		for(int i=0;i<16;i++)
-		{
-			transf[i]=mat[i];
-			inv_transf[i]=inv_mat[i];
-		}
-
-		return s;
-	}
-
 }

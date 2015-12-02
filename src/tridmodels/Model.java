@@ -10,21 +10,24 @@ import tridmodels.primitives.Vertex;
  *
  */
 
-public abstract class Model {
+public class Model {
 	
 	double trX=0,trY=0,trZ=0;
 	double rotX=0,rotY=0,rotZ=0;
 	double scX=1,scY=1,scZ=1;
+	
+	public boolean toAnimate=false;
 
+	private Solide solide;
 	private Vertex position, speed, acceleration;
 	private BoundingBox boundingBox;
 	private double weight;
 
-	public Model(Vertex position, double weight){
+	public Model(Solide s,Vertex position, double weight){
 		this.position = position;
 		this.speed = new Vertex(0,0,0);
 		this.acceleration = new Vertex(0,0,0);
-
+		solide= s;
 		this.setWeight(weight);
 	}
 	
@@ -102,8 +105,6 @@ public abstract class Model {
 		scZ=r[2];
 	}
 	
-	public abstract void dessin_OpenGL(GL2 gl);
-	
 	public void dessine3DObj(GL2 gl){
 		gl.glPushMatrix();
 		
@@ -117,7 +118,7 @@ public abstract class Model {
 		
 		//scale
 		gl.glScaled(scX, scY, scZ);
-		dessin_OpenGL(gl);
+		solide.dessin_OpenGL(gl);
 		gl.glPopMatrix();
 	}
 	
@@ -191,6 +192,10 @@ public abstract class Model {
 
 	public void setWeight(double weight) {
 		this.weight = weight;
+	}
+
+	public Solide getSolide() {
+		return solide;
 	}
 	
 }

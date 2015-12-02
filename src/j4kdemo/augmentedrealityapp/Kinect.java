@@ -3,6 +3,7 @@ package j4kdemo.augmentedrealityapp;
 import edu.ufl.digitalworlds.j4k.DepthMap;
 import edu.ufl.digitalworlds.j4k.J4KSDK;
 import edu.ufl.digitalworlds.j4k.Skeleton;
+import edu.ufl.digitalworlds.math.Geom;
 
 
 /*
@@ -42,12 +43,14 @@ import edu.ufl.digitalworlds.j4k.Skeleton;
 public class Kinect extends J4KSDK{
 
 	ViewerPanel3D viewer=null;
+	float mem_sk[];
 
 	public Kinect()
 	{
 		super();
 		this.setSeatedSkeletonTracking(true);
 		this.setNearMode(true);
+		mem_sk=new float[25*3];
 	}
 
 
@@ -56,14 +59,53 @@ public class Kinect extends J4KSDK{
 
 	@Override
 	public void onDepthFrameEvent(short[] depth, byte[] player_index, float[] XYZ, float[] UV) {
+		if(viewer==null)return;
+		DepthMap map=new DepthMap(getDepthWidth(),getDepthHeight(),XYZ);
+		map.setPlayerIndex(depth, player_index);
+		if(UV!=null) map.setUV(UV);
+		map.setMaximumAllowedDeltaZ(5);
+		viewer.current_map=map;
 	}
 
 	@Override
 	public void onSkeletonFrameEvent(boolean[] flags, float[] positions, float[] orientations, byte[] joint_status) {
-		if(viewer==null || viewer.skeletons==null)return;
-		for(int i=0;i<getMaxNumberOfSkeletons();i++)
-			viewer.skeletons[i]=Skeleton.getSkeleton(i, flags, positions,orientations, joint_status,this);
+		if(viewer==null)return;
 
+		Skeleton found=null;
+		Skeleton skel;
+		float sk[];
+		
+		for(int i=0;i<6 && found==null;i++){
+			
+			skel=Skeleton.getSkeleton(i, flags, positions,orientations, joint_status,this);
+			if(skel!=null) 
+			{
+				//mise à jour des positions du squelette
+				if(skel.isTracked())
+				{
+					found=skel;
+					sk=found.getJointPositions();
+					for(int j=0;j<sk.length;j++) mem_sk[j]=(float) (0.05*mem_sk[j]+0.95*sk[j]);
+					found.setJointPositions(mem_sk);
+				}
+			}
+		}
+
+		//initialisation d'un squelette à l'aide du tableau des 
+		viewer.skeleton=found;
+
+		double transf[]=Geom.identity4();
+		double inv_transf[]=Geom.identity4();
+		//transformations à effectuer pour suivre la main T
+		double nrm[]=found.getTorsoOrientation();
+		double hr[]=found.get3DJoint(Skeleton.WRIST_RIGHT);
+		double kr[]=found.get3DJoint(Skeleton.HAND_RIGHT);
+
+		transformBody4(-hr[0],hr[1],-hr[2],
+				-kr[0],kr[1],-kr[2],
+				-nrm[0],nrm[1],nrm[2],transf,inv_transf);
+		viewer.transf=transf;
+		viewer.inv_transf=inv_transf;
 	}
 
 	@Override
@@ -72,5 +114,54 @@ public class Kinect extends J4KSDK{
 		viewer.videoTexture.update(getColorWidth(), getColorHeight(), data);
 	}
 
+	//Calcul des transformations
+	private double transformBody4(double joint_id_1_x, double joint_id_1_y, double joint_id_1_z, double joint_id_2_x, double joint_id_2_y, double joint_id_2_z, double normal_x,double normal_y,double normal_z,double[] transf, double[] inv_transf)
+	{
+		double mat[]=Geom.identity4();
+		double inv_mat[]=Geom.identity4();
 
+		double v[]=Geom.vector(joint_id_1_x-joint_id_2_x,joint_id_1_y-joint_id_2_y,joint_id_1_z-joint_id_2_z);
+		double vv[]=Geom.vector(normal_x,normal_y,normal_z);
+		double s=Geom.magnitude(v);
+		v=Geom.normalize(v);
+
+		if(v[1]<0) vv=Geom.vector(normal_x,normal_y,-normal_z);
+
+		double n[]=Geom.normalize(Geom.normal(v,Geom.vector(0,1,0)));
+
+		//Moving the center of our coordinate system to the middle point of the line segment
+		//gl.glTranslated((joint_id_1_x+joint_id_2_x)/2.0, (joint_id_1_y+joint_id_2_y)/2.0, (joint_id_1_z+joint_id_2_z)/2.0);
+		mat=Geom.Mult4(mat, Geom.translate4((joint_id_1_x+joint_id_2_x)/2.0, (joint_id_1_y+joint_id_2_y)/2.0, (joint_id_1_z+joint_id_2_z)/2.0));
+		inv_mat=Geom.Mult4(Geom.translate4(-(joint_id_1_x+joint_id_2_x)/2.0, -(joint_id_1_y+joint_id_2_y)/2.0, -(joint_id_1_z+joint_id_2_z)/2.0),inv_mat);
+
+
+		double b = -Math.acos(v[1]);double c = Math.cos(b);double ac = 1.00 - c;double si = Math.sin(b);
+		//The orientation of the rotated z axis after Rotation 1
+		double nz[]=Geom.vector(n[0] * n[2] * ac + n[1] * si,n[1] * n[2] * ac - n[0] * si,n[2] * n[2] * ac + c);
+		//The orientation of the rotated x axis after Rotation 1
+		double nx[]=Geom.vector(n[0] * n[0] * ac + c,n[1] * n[0] * ac + n[2] * si,n[2] * n[0] * ac -n[1]*si);
+
+
+		//Rotation 1: Moving the Y axis to be parallel to the vector p1-p2
+		mat=Geom.Mult4(mat, Geom.rotate4(b*180.0/3.1416,n[0],n[1],n[2]));
+		inv_mat=Geom.Mult4(Geom.rotate4(-b*180.0/3.1416,n[0],n[1],n[2]),inv_mat);
+
+		//Rotation 2: Moving the object around the Y axis 
+		si=vv[0]*nz[0]+vv[1]*nz[1]+vv[2]*nz[2];
+		c=vv[0]*nx[0]+vv[1]*nx[1]+vv[2]*nx[2];
+		b=Math.sqrt(si*si+c*c);
+
+		{	//gl.glRotated(90-Math.atan2(si/b,c/b)*180.0/3.1416,0,1,0);
+			mat=Geom.Mult4(mat, Geom.rotate4(90-Math.atan2(si/b,c/b)*180.0/3.1416,0,1,0));
+			inv_mat=Geom.Mult4(Geom.rotate4(-90+Math.atan2(si/b,c/b)*180.0/3.1416,0,1,0),inv_mat);
+		}
+
+		for(int i=0;i<16;i++)
+		{
+			transf[i]=mat[i];
+			inv_transf[i]=inv_mat[i];
+		}
+
+		return s;
+	}
 }
