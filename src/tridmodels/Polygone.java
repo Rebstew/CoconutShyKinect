@@ -5,29 +5,33 @@ import java.util.Vector;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
+import tridmodels.primitives.Couleur;
+import tridmodels.primitives.Normal;
+import tridmodels.primitives.Vertex;
 
-public class CPolygone {
-	Vector<CVertex> vertice;
-	Vector<CCouleur> colors;
-	Vector<CNormale> normals;
+
+public class Polygone {
+	Vector<Vertex> vertice;
+	Vector<Couleur> colors;
+	Vector<Normal> normals;
 	
-	public CPolygone(){
-		vertice=new Vector<CVertex>();
-		colors=new Vector<CCouleur>();
-		normals=new Vector<CNormale>();
+	public Polygone(){
+		vertice=new Vector<Vertex>();
+		colors=new Vector<Couleur>();
+		normals=new Vector<Normal>();
 	}
 	//accessors
-	public Vector<CVertex> getVertice(){return vertice;};
-	public Vector<CCouleur> getColors(){return colors;};
-	public Vector<CNormale> getNormals(){return normals;};
+	public Vector<Vertex> getVertice(){return vertice;};
+	public Vector<Couleur> getColors(){return colors;};
+	public Vector<Normal> getNormals(){return normals;};
 	//modifiers
-	public void addVertex(CVertex v){
+	public void addVertex(Vertex v){
 		vertice.add(v);
 	}
-	public void addNormal(CNormale v){
+	public void addNormal(Normal v){
 		normals.add(v);
 	}
-	public void addElement(CVertex v, CCouleur c, CNormale n){
+	public void addElement(Vertex v, Couleur c, Normal n){
 		vertice.add(v);
 		colors.add(c);
 		normals.add(n);
@@ -49,7 +53,7 @@ public class CPolygone {
 		for(int i=0; i<vertice.size();i++){
 			gl.glColor3d(255,0, 0);
 		    gl.glNormal3fv(normals.get(i).getNormal(), 0);
-		    CVertex v=vertice.get(i);
+		    Vertex v=vertice.get(i);
 		    if(v.getUVCoord()!=null){
 		    	gl.glTexCoord2d(v.getUVCoord().getX(), v.getUVCoord().getY());
 		    }
@@ -61,7 +65,7 @@ public class CPolygone {
 	}
 	public double[] calculeCentre(){
 		double cX=0,cY=0,cZ=0;
-		for(CVertex v:vertice){
+		for(Vertex v:vertice){
 			cX+=v.getX();
 			cY+=v.getY();
 			cZ+=v.getZ();

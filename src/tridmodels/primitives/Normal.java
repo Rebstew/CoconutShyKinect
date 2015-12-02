@@ -1,14 +1,14 @@
-package tridmodels;
+package tridmodels.primitives;
 
 
-public class CNormale {
+public class Normal {
 	float x, y, z;
-	public CNormale(){
+	public Normal(){
 		x=0;
 		y=1;
 		z=0;
 	}
-	public CNormale(float x, float y, float z){
+	public Normal(float x, float y, float z){
 		this.x=x;
 		this.y=y;
 		this.z=z;

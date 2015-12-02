@@ -8,8 +8,8 @@ import javax.media.opengl.GL2;
 import edu.ufl.digitalworlds.math.Geom;
 import edu.ufl.digitalworlds.opengl.OpenGLPanel;
 import edu.ufl.digitalworlds.opengl.OpenGLTexture;
-import tridmodels.CActeur;
-import tridmodels.CSolide;
+import tridmodels.Model;
+import tridmodels.Solide;
 import edu.ufl.digitalworlds.j4k.DepthMap;
 import edu.ufl.digitalworlds.j4k.Skeleton;
 import edu.ufl.digitalworlds.j4k.VideoFrame;
@@ -61,7 +61,7 @@ public class ViewerPanel3D extends OpenGLPanel
 	OpenGLTexture xray;
 	OpenGLTexture box;
 	
-	CSolide model;
+	Solide model;
 
 	int mode=5; /* mode 3: squelette + profondeur
 					mode4: squelette
@@ -70,7 +70,7 @@ public class ViewerPanel3D extends OpenGLPanel
 	float mem_sk[];
 	
 
-	Vector<CActeur> acteurs;
+	Vector<Model> acteurs;
 
 	public void setup()
 	{
@@ -105,9 +105,9 @@ public class ViewerPanel3D extends OpenGLPanel
 		
 		
 		//Chargement des modèles 3D
-		acteurs=new Vector<CActeur>();
-		acteurs.add(CSolide.lireFichierObj("./data/models/sphere.obj"));
-		((CSolide)acteurs.get(0)).texturerAvec("./data/baseball.jpg");
+		acteurs=new Vector<Model>();
+		acteurs.add(Solide.lireFichierObj("./data/models/sphere.obj"));
+		((Solide)acteurs.get(0)).texturerAvec("./data/baseball.jpg");
 	}	
 
 

@@ -14,15 +14,26 @@ import javax.media.opengl.GLException;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.texture.TextureIO;
 
+import tridmodels.primitives.Couleur;
+import tridmodels.primitives.Normal;
+import tridmodels.primitives.UVCoords;
+import tridmodels.primitives.Vertex;
 
-public class CSolide extends CActeur{
-	Vector<CPolygone> polys;
+
+public class Solide extends Model{
+	Vector<Polygone> polys;
 	Integer glList;
 	private Integer texture;
 	private File textureFile;
+	private BoundingBox boundingBox;
 	
-	public CSolide(){
-		polys=new Vector<CPolygone>();
+	public Solide(){
+		super(new Vertex(), 0);
+	}
+	
+	public Solide(Vertex position, Vector<Polygone> polys,double weight){
+		super(position, weight);
+		polys=new Vector<Polygone>();
 		glList=null;
 		texture=null;
 		textureFile=null;
@@ -43,7 +54,7 @@ public class CSolide extends CActeur{
 			gl.glNewList(glList, GL_COMPILE);
 				double[] center=calculeCentre();
 				gl.glTranslated(-center[0], -center[1], center[2]);
-				for(CPolygone p : polys){
+				for(Polygone p : polys){
 					p.c(gl, texture);
 				}
 			gl.glEndList();
@@ -55,7 +66,7 @@ public class CSolide extends CActeur{
 	
 	public double[] calculeCentre(){
 		double cX=0,cY=0,cZ=0;
-		for(CPolygone p : polys){
+		for(Polygone p : polys){
 			double[] c=p.calculeCentre();
 			cX+=c[0];
 			cY+=c[1];
@@ -73,13 +84,13 @@ public class CSolide extends CActeur{
 			e.printStackTrace();
 		}
 	}
-	static public CSolide lireFichierObj(String fName){
-		CSolide res=new CSolide();
+	static public Solide lireFichierObj(String fName){
+		Solide res=new Solide();
 		try {
 			BufferedReader br=new BufferedReader(new FileReader(fName));
 			String line;
 			Vector<double[]> vertice=new Vector<double[]>();
-			Vector<CNormale> norms=new Vector<CNormale>();
+			Vector<Normal> norms=new Vector<Normal>();
 			Vector<Integer[][]> faces=new Vector<Integer[][]>();
 			Vector<double[]> uv=new Vector<double[]>();
 			
@@ -89,7 +100,7 @@ public class CSolide extends CActeur{
 					if(parts[0].equals("v")){ //lecture des vertice
 						vertice.add(new double[]{Double.parseDouble(parts[1]),Double.parseDouble(parts[2]),Double.parseDouble(parts[3])});
 					}else if(parts[0].equals("vn")){ //lecture des normales
-						norms.add(new CNormale(Float.parseFloat(parts[1]),Float.parseFloat(parts[2]),Float.parseFloat(parts[3])));
+						norms.add(new Normal(Float.parseFloat(parts[1]),Float.parseFloat(parts[2]),Float.parseFloat(parts[3])));
 					}else if(parts[0].equals("f")){ //lecture des faces
 						Integer[][] face=new Integer[parts.length-1][3];
 						for(int j=1;j<parts.length;j++){
@@ -122,7 +133,7 @@ public class CSolide extends CActeur{
 			
 			//création des polygones
 			for(int i=0; i<faces.size();i++){
-				CPolygone p=new CPolygone();
+				Polygone p=new Polygone();
 				Integer[][]face=faces.get(i);
 				for(Integer[] vertex: face){
 					if(vertex[2]==null){
@@ -130,30 +141,30 @@ public class CSolide extends CActeur{
 							double[] coord=uv.get((vertex[1]-1));
 							double[] v=vertice.get((vertex[0]-1));
 							p.addElement(
-									new CVertex(v[0], v[1], v[2], new CUVCoords(coord[0],coord[1])), 
-									new CCouleur(), 
-									new CNormale());
+									new Vertex(v[0], v[1], v[2], new UVCoords(coord[0],coord[1])), 
+									new Couleur(), 
+									new Normal());
 						}else{
 							double[] v=vertice.get((vertex[0]-1));
 							p.addElement(
-									new CVertex(v[0], v[1], v[2]), 
-									new CCouleur(), 
-									new CNormale());							
+									new Vertex(v[0], v[1], v[2]), 
+									new Couleur(), 
+									new Normal());							
 						}					
 					}else{
 						if(vertex[1]!=null){
 							double[] coord=uv.get((vertex[1]-1));
 							double[] v=vertice.get((vertex[0]-1));
 							p.addElement(
-									new CVertex(v[0], v[1], v[2], new CUVCoords(coord[0],coord[1])), 
-									new CCouleur(),
+									new Vertex(v[0], v[1], v[2], new UVCoords(coord[0],coord[1])), 
+									new Couleur(),
 									norms.get( (vertex[2]-1)));
 							
 						}else{
 							double[] v=vertice.get((vertex[0]-1));
 							p.addElement(
-									new CVertex(v[0], v[1], v[2]), 
-									new CCouleur(), 
+									new Vertex(v[0], v[1], v[2]), 
+									new Couleur(), 
 									norms.get((vertex[2]-1)));
 						}
 					}

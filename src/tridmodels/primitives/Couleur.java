@@ -1,19 +1,19 @@
-package tridmodels;
+package tridmodels.primitives;
 
 
-public class CCouleur {
+public class Couleur {
 	double r,g,b;
-	public CCouleur(){
+	public Couleur(){
 		r=0xff;
 		g=0xff;
 		b=0xff;
 	}
-	public CCouleur(int hex){
+	public Couleur(int hex){
 		r=(hex >> 16) & 0xFF;
 		g=(hex >> 8) & 0xFF;
 		b=hex & 0xFF;
 	}
-	public CCouleur(int r, int g, int b){
+	public Couleur(int r, int g, int b){
 		this.r=r;
 		this.g=g;
 		this.b=b;

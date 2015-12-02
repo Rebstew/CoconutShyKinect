@@ -1,6 +1,8 @@
 package tridmodels;
 
-public class Vector {
+import tridmodels.primitives.Vertex;
+
+public class Vector extends Vertex{
 	public double x, y, z;
 	
 	public Vector(double x, double y, double z){

@@ -1,13 +1,13 @@
-package tridmodels;
+package tridmodels.primitives;
 
 
-public class CUVCoords{
+public class UVCoords{
 	double x,y;
 
-	public CUVCoords(){
+	public UVCoords(){
 		x=0;y=0;
 	}
-	public CUVCoords(double i,double j){
+	public UVCoords(double i,double j){
 		x=i;y=j;
 	}
 	
