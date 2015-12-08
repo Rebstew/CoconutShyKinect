@@ -28,4 +28,31 @@ public class Vector extends Vertex{
 				Math.sqrt((anotherVector.x*anotherVector.x + anotherVector.y*anotherVector.y + anotherVector.z*anotherVector.z));
 		return Math.toDegrees(Math.acos(scalarProduct / normProduct));
 	}	
+	
+	/**
+	 * Returns the dot product of this Vector by another Vector
+	 * @param anotherVector
+	 * @return 
+	 */
+	public double dot(Vector anotherVector){
+		return x*anotherVector.x + y*anotherVector.y + z*anotherVector.z;
+	}
+	
+	/**
+	 * Returns the product of this Vector with another Vector
+	 * @param anotherVector
+	 * @return
+	 */
+	public Vector mult(Vector anotherVector){
+		return new Vector(x*anotherVector.x, y*anotherVector.y, z*anotherVector.z);
+	}
+	
+	/**
+	 * Returns the product of this Vector by a number.
+	 * @param number the number to multiply this Vector with
+	 * @return a new Vector, with its coefficients being this coefficients, multiplied by the number
+	 */
+	public Vector mult(double number){
+		return new Vector(x*number, y*number, z*number);
+	}
 }
