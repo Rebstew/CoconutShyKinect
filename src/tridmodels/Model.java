@@ -46,7 +46,7 @@ public class Model {
 	}
 	
 	public void draw(GL2 gl){
-		dessin_OpenGL(gl);
+		solide.dessin_OpenGL(gl);
 	}
 	
 	public void dessine3DObj(GL2 gl){
