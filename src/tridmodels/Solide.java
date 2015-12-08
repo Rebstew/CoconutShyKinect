@@ -20,7 +20,7 @@ import tridmodels.primitives.UVCoords;
 import tridmodels.primitives.Vertex;
 
 
-public class Solide extends Model{
+public class Solide{
 	Vector<Polygone> polys;
 	Integer glList;
 	private Integer texture;
@@ -28,11 +28,13 @@ public class Solide extends Model{
 	private BoundingBox boundingBox;
 	
 	public Solide(){
-		super(new Vertex(), 0);
+		polys=new Vector<Polygone>();
+		glList=null;
+		texture=null;
+		textureFile=null;
 	}
 	
 	public Solide(Vertex position, Vector<Polygone> polys,double weight){
-		super(position, weight);
 		polys=new Vector<Polygone>();
 		glList=null;
 		texture=null;
