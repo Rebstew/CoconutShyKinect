@@ -1,4 +1,4 @@
-package j4kdemo.augmentedrealityapp;
+package coconutshy.augmentedreality;
 
 import java.awt.event.KeyEvent;
 import java.util.Vector;
@@ -60,6 +60,7 @@ public class ViewerPanel3D extends OpenGLPanel{
 	Skeleton skeleton;
 	double transf[]=Geom.identity4();
 	double inv_transf[]=Geom.identity4();
+	double[] transfThrown;
 
 	DepthMap current_map=null;
 	VideoFrame videoTexture;
@@ -100,6 +101,9 @@ public class ViewerPanel3D extends OpenGLPanel{
 		
 		ball=new Model(Solide.lireFichierObj("./data/models/sphere.obj"), new Vertex(), 0);
 		ball.getSolide().texturerAvec("./data/baseball.jpg");
+		ball.setScX(0.05);
+		ball.setScY(0.05);
+		ball.setScZ(0.05);
 		
 		Model table=new Model(Solide.lireFichierObj("./data/models/table.obj"), new Vertex(), 0);
 		table.getSolide().texturerAvec("./data/wood.jpg");
@@ -109,8 +113,7 @@ public class ViewerPanel3D extends OpenGLPanel{
 		Model can=new Model(Solide.lireFichierObj("./data/models/can.obj"), new Vertex(), 0);
 		can.getSolide().texturerAvec("./data/aluminium.jpg");
 		models.add(can);	
-		
-//		ball=can;
+
 	}	
 
 
@@ -155,14 +158,17 @@ public class ViewerPanel3D extends OpenGLPanel{
 
 				gl.glLoadIdentity();
 				gl.glMultMatrixd(transf,0);
-				gl.glScaled(.05,.05,.05);
-		
-				rotateY(180);
 				ball.dessine3DObj(gl);
 				
 			popMatrix();
 		}else{ //@TODO NE pas oublier d'animer le modèle à partir de ce moment là
-			ball.dessine3DObj(gl);
+			pushMatrix();
+
+				gl.glLoadIdentity();
+				gl.glMultMatrixd(transfThrown,0);
+				ball.dessine3DObj(gl);
+				
+			popMatrix();
 		}
 		
 		//dessin acteurs

@@ -1,4 +1,4 @@
-package j4kdemo.augmentedrealityapp;
+package coconutshy.augmentedreality;
 
 import edu.ufl.digitalworlds.gui.DWApplet;
 

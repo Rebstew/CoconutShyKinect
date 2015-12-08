@@ -1,9 +1,11 @@
-package j4kdemo.augmentedrealityapp;
+package coconutshy.augmentedreality;
 
 import edu.ufl.digitalworlds.j4k.DepthMap;
 import edu.ufl.digitalworlds.j4k.J4KSDK;
 import edu.ufl.digitalworlds.j4k.Skeleton;
 import edu.ufl.digitalworlds.math.Geom;
+import tridmodels.Vector;
+import tridmodels.primitives.Vertex;
 
 
 /*
@@ -44,6 +46,9 @@ public class Kinect extends J4KSDK{
 
 	ViewerPanel3D viewer=null;
 	float mem_sk[];
+	long timeSet;
+	double[] posBallStart;
+	Animator a;
 
 	public Kinect()
 	{
@@ -51,6 +56,12 @@ public class Kinect extends J4KSDK{
 		this.setSeatedSkeletonTracking(true);
 		this.setNearMode(true);
 		mem_sk=new float[25*3];
+		posBallStart=new double[3];
+		a=new Animator(viewer);
+	}
+	
+	public void setAnimator(Animator a){
+		this.a=a;
 	}
 
 
@@ -78,40 +89,61 @@ public class Kinect extends J4KSDK{
 		for(int i=0;i<6 && found==null;i++){
 			
 			skel=Skeleton.getSkeleton(i, flags, positions,orientations, joint_status,this);
-			if(skel!=null) 
-			{
-				//mise à jour des positions du squelette
-				if(skel.isTracked())
-				{
-					found=skel;
-					sk=found.getJointPositions();
-					for(int j=0;j<sk.length;j++) mem_sk[j]=(float) (0.05*mem_sk[j]+0.95*sk[j]);
-					found.setJointPositions(mem_sk);
-				}
+			if(skel!=null && skel.isTracked()){
+				found=skel;
+				sk=found.getJointPositions();
+				for(int j=0;j<sk.length;j++) mem_sk[j]=(float)(0.02*mem_sk[j]+0.98*sk[j]);
+				found.setJointPositions(mem_sk);
 			}
 		}
 
 		//initialisation d'un squelette à l'aide du tableau des 
 		viewer.skeleton=found;
 
-		double transf[]=Geom.identity4();
-		double inv_transf[]=Geom.identity4();
-		//transformations à effectuer pour suivre la main T
-		double nrm[]=found.getTorsoOrientation();
-		double hr[]=found.get3DJoint(Skeleton.WRIST_RIGHT);
-		double kr[]=found.get3DJoint(Skeleton.HAND_RIGHT);
+		//ATTENTION MAGIE NOIRE
+			double transf[]=Geom.identity4();
+			double inv_transf[]=Geom.identity4();
+			//transformations à effectuer pour suivre la main T
+			double nrm[]=found.getTorsoOrientation();
+			double hr[]=found.get3DJoint(Skeleton.WRIST_RIGHT);
+			double kr[]=found.get3DJoint(Skeleton.HAND_RIGHT);
+			transformBody4(-hr[0],hr[1],-hr[2],-kr[0],kr[1],-kr[2],	-nrm[0],nrm[1],nrm[2],transf,inv_transf);
+			viewer.transf=transf;
+			viewer.inv_transf=inv_transf;
+		//FIN DE LA SORCELLERIE
 
-		transformBody4(-hr[0],hr[1],-hr[2],
-				-kr[0],kr[1],-kr[2],
-				-nrm[0],nrm[1],nrm[2],transf,inv_transf);
-		viewer.transf=transf;
-		viewer.inv_transf=inv_transf;
+		double[]v1=found.get3DJoint(Skeleton.SHOULDER_RIGHT);
+		double[]v2=found.get3DJoint(Skeleton.ELBOW_RIGHT);
+		double[]v3=found.get3DJoint(Skeleton.HAND_RIGHT);
+		double angleArm=Math.abs(new Vector(v3[0]-v2[0], v3[1]-v2[1], v3[2]-v2[2]).angleWith(new Vector(v1[0]-v2[0], v1[1]-v2[1], v1[2]-v2[2])));
+				
+		if(angleArm>160 && !viewer.ball.toAnimate){
+			// calcul vitesse balle 
+			long time=timeSet-System.currentTimeMillis();
+			viewer.transfThrown=transf;
+			viewer.ball.setSpeed(new Vertex(
+					Math.abs((transf[3]-posBallStart[0])/time),
+					Math.abs((transf[7]-posBallStart[1])/time),
+					Math.abs((transf[11]-posBallStart[2])/time)
+					));
+			
+			viewer.ball.toAnimate=true;
+		}
+		if(angleArm<60){
+			timeSet=System.currentTimeMillis();
+			viewer.ball.toAnimate=false;
+			posBallStart[0]=transf[3];
+			posBallStart[1]=transf[7];
+			posBallStart[2]=transf[11];
+		}
 	}
 
 	@Override
 	public void onColorFrameEvent(byte[] data) {
 		if(viewer==null || viewer.videoTexture==null) return;
 		viewer.videoTexture.update(getColorWidth(), getColorHeight(), data);
+		
+		a.animate();
 	}
 
 	//Calcul des transformations

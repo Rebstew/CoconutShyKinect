@@ -1,8 +1,10 @@
-package j4kdemo.augmentedrealityapp;
+package coconutshy.augmentedreality;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 
 import javax.swing.JPanel;
+
+import com.jogamp.opengl.util.FPSAnimator;
 
 import edu.ufl.digitalworlds.gui.DWApp;
 import edu.ufl.digitalworlds.j4k.J4KSDK;
@@ -47,6 +49,7 @@ public class AugmentedRealityApp extends DWApp
 
 	Kinect myKinect;
 	ViewerPanel3D main_panel;
+	FPSAnimator animator;
 
 	public void GUIsetup(JPanel p_root) {
 
@@ -72,7 +75,6 @@ public class AugmentedRealityApp extends DWApp
 		myKinect.setViewer(main_panel);
 
 		p_root.add(main_panel, BorderLayout.CENTER);
-
 	}
 
 	public void GUIclosing()
