@@ -2,7 +2,7 @@ package tridmodels;
 
 import javax.media.opengl.GL2;
 
-import tridmodels.primitives.Vertex;
+import tridmodels.Vector;
 
 /**
  * Represents a 3d model, with collision
@@ -10,50 +10,44 @@ import tridmodels.primitives.Vertex;
  *
  */
 
-public class Model {
-	
-	double trX=0,trY=0,trZ=0;
+public abstract class Model {
 	double rotX=0,rotY=0,rotZ=0;
 	double scX=1,scY=1,scZ=1;
 	
 	public boolean toAnimate=false;
 
 	private Solide solide;
-	private Vertex position, speed, acceleration;
+	private Vector position, speed, acceleration;
 	private BoundingBox boundingBox;
 	private double weight;
 	private final double MAX_VELOCITY = 10;
-	private final Vertex GRAVITY = new Vertex(0,-9.81, 0);
+	private final Vector GRAVITY = new Vector(0,-9.81, 0);
+	private double[] transf;
 
-	public Model(Solide s,Vertex position, double weight){
+	public Model(Solide s,Vector position, double weight){
 		this.position = position;
-		this.speed = new Vertex(0,0,0);
-		this.acceleration = new Vertex(0,0,0);
+		this.speed = new Vector(0,0,0);
+		this.acceleration = new Vector(0,0,0);
 		solide= s;
 		this.setWeight(weight);
 	}
-	
-	public void animate(){
-		
-		//detection collision avec voisins
-		
-		//si boite, boite tombe pas toute seule
-		
-		//bouge
-		
-		
-		
-	}
+	//detection collision avec voisins
+	//si boite, boite tombe pas toute seule
+	//bouge
+	public abstract void animate();
 	
 	public void draw(GL2 gl){
 		solide.dessin_OpenGL(gl);
 	}
 	
 	public void dessine3DObj(GL2 gl){
-		gl.glPushMatrix();
 		
+		gl.glPushMatrix();
+
+		gl.glLoadIdentity();
+		gl.glMultMatrixd(transf,0);
 		//translation
-		gl.glTranslated(trX, trY, trZ);
+		gl.glTranslated(position.getX(), position.getY(), position.getZ());
 		
 		//rotation Z*Y*X
 		gl.glRotated(rotZ, 0.0f, 0.0f, 1.0f);
@@ -67,7 +61,7 @@ public class Model {
 	}
 	
 	public String toString() {
-		return "Model [trX=" + trX + ", trY=" + trY + ", trZ=" + trZ
+		return "Model [trX=" + position.getX() + ", trY=" + position.getY() + ", trZ=" + position.getZ()
 				+ ", rotX=" + rotX + ", rotY=" + rotY + ", rotZ=" + rotZ
 				+ ", scX=" + scX + ", scY=" + scY + ", scZ=" + scZ + "]";
 	
@@ -98,27 +92,28 @@ public class Model {
 		return 0.0;
 	}
 
-	public Vertex getPosition() {
+	public Vector getPosition() {
 		return position;
 	}
 
-	public void setPosition(Vertex position) {
+	public void setPosition(Vector position) {
 		this.position = position;
+		
 	}
 
-	public Vertex getSpeed() {
+	public Vector getSpeed() {
 		return speed;
 	}
 
-	public void setSpeed(Vertex speed) {
+	public void setSpeed(Vector speed) {
 		this.speed = speed;
 	}
 
-	public Vertex getAcceleration() {
+	public Vector getAcceleration() {
 		return acceleration;
 	}
 
-	public void setAcceleration(Vertex acceleration) {
+	public void setAcceleration(Vector acceleration) {
 		this.acceleration = acceleration;
 	}
 
@@ -143,15 +138,6 @@ public class Model {
 	}
 	
 	//Getters
-		public double getTrX() {
-			return trX;
-		}
-		public double getTrY() {
-			return trY;
-		}
-		public double getTrZ() {
-			return trZ;
-		}
 		public double getRotX() {
 			return rotX;
 		}
@@ -172,15 +158,6 @@ public class Model {
 		}
 		
 		//Setters
-		public void setTrX(double trX) {
-			this.trX = trX;
-		}
-		public void setTrY(double trY) {
-			this.trY = trY;
-		}
-		public void setTrZ(double trZ) {
-			this.trZ = trZ;
-		}
 		public void setRotX(double rotX) {
 			this.rotX = rotX;
 		}
@@ -205,15 +182,17 @@ public class Model {
 			rotY=r[1];
 			rotZ=r[2];
 		}
-		public void translationEns(float[] r){
-			trX=r[0];
-			trY=r[1];
-			trZ=r[2];
-		}
 		public void echelleEns(float[] r){
 			scX=r[0];
 			scY=r[1];
 			scZ=r[2];
+		}
+		public void setTransformation(double[] transfThrown) {
+			this.transf=transfThrown;
+			
+		}public double[] getTransformation() {
+			return transf;
+			
 		}
 	
 }

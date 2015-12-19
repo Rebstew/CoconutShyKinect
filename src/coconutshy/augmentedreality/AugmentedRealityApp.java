@@ -1,8 +1,14 @@
 package coconutshy.augmentedreality;
 import java.awt.BorderLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import com.jogamp.opengl.util.FPSAnimator;
 
@@ -44,12 +50,15 @@ import edu.ufl.digitalworlds.j4k.J4KSDK;
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 @SuppressWarnings("serial")
-public class AugmentedRealityApp extends DWApp 
+public class AugmentedRealityApp extends DWApp implements ChangeListener
 {
 
 	Kinect myKinect;
 	ViewerPanel3D main_panel;
 	FPSAnimator animator;
+
+	JCheckBox seated_skeleton;
+	JSlider elevation_angle;
 
 	public void GUIsetup(JPanel p_root) {
 
@@ -62,7 +71,6 @@ public class AugmentedRealityApp extends DWApp
 		setLoadingProgress("Intitializing Kinect...",20);
 		myKinect=new Kinect();
 
-
 		if(!myKinect.start(J4KSDK.DEPTH|J4KSDK.SKELETON|J4KSDK.COLOR|J4KSDK.XYZ|J4KSDK.UV|J4KSDK.PLAYER_INDEX))
 		{
 			DWApp.showErrorDialog("ERROR", "<html><center><br>ERROR: The Kinect device could not be initialized.<br><br>1. Check if the Microsoft's Kinect SDK was succesfully installed on this computer.<br> 2. Check if the Kinect is plugged into a power outlet.<br>3. Check if the Kinect is connected to a USB port of this computer.</center>");
@@ -74,25 +82,58 @@ public class AugmentedRealityApp extends DWApp
 		main_panel=new ViewerPanel3D();
 		myKinect.setViewer(main_panel);
 
+
+		JPanel controls=new JPanel(new GridLayout(0,3));
+
+		seated_skeleton=new JCheckBox("Seated skeleton");
+		seated_skeleton.addActionListener(this);
+		if(myKinect.getDeviceType()!=J4KSDK.MICROSOFT_KINECT_1) seated_skeleton.setEnabled(false);
+		controls.add(seated_skeleton);
+
+		controls.add(new JLabel("Camera orientation: "));
+		elevation_angle=new JSlider();
+		elevation_angle.setMinimum(-27);
+		elevation_angle.setMaximum(27);
+		elevation_angle.setValue((int)myKinect.getElevationAngle());
+		elevation_angle.setToolTipText("Elevation Angle ("+elevation_angle.getValue()+" degrees)");
+		elevation_angle.addChangeListener(this);
+		controls.add(elevation_angle);
+		p_root.add(controls, BorderLayout.SOUTH);
+
 		p_root.add(main_panel, BorderLayout.CENTER);
 	}
 
-	public void GUIclosing()
-	{
+	public void GUIclosing(){
 		myKinect.stop();
 	}
 
 
 
 	public static void main(String args[]) {
-
 		createMainFrame("Augmented Reality App");
 		app=new AugmentedRealityApp();
 		setFrameSize(730,570,null);
 	}
 
 	@Override
-	public void GUIactionPerformed(ActionEvent e)
-	{
+	public void GUIactionPerformed(ActionEvent e){
+		if(e.getSource()==seated_skeleton)
+		{
+			if(seated_skeleton.isSelected()) myKinect.setSeatedSkeletonTracking(true);
+			else myKinect.setSeatedSkeletonTracking(false);
+		}
+	}
+
+	@Override
+	public void stateChanged(ChangeEvent e) {
+		if(e.getSource()==elevation_angle)
+		{
+			if(!elevation_angle.getValueIsAdjusting())
+			{
+				myKinect.setElevationAngle(elevation_angle.getValue());
+				elevation_angle.setToolTipText("Elevation Angle ("+elevation_angle.getValue()+" degrees)");
+			}
+		}
+
 	}
 }

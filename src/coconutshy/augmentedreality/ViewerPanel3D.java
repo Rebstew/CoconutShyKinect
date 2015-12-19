@@ -1,15 +1,16 @@
 package coconutshy.augmentedreality;
 
 import java.awt.event.KeyEvent;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
 
 import edu.ufl.digitalworlds.math.Geom;
 import edu.ufl.digitalworlds.opengl.OpenGLPanel;
+import tridmodels.Ball;
 import tridmodels.Model;
 import tridmodels.Solide;
-import tridmodels.primitives.Vertex;
+import tridmodels.Vector;
 import edu.ufl.digitalworlds.j4k.DepthMap;
 import edu.ufl.digitalworlds.j4k.Skeleton;
 import edu.ufl.digitalworlds.j4k.VideoFrame;
@@ -55,7 +56,7 @@ public class ViewerPanel3D extends OpenGLPanel{
 					mode4: squelette
 					mode 5: caisse */
 	Model ball;
-	Vector<Model> models;
+	ArrayList<Model> models;
 
 	Skeleton skeleton;
 	double transf[]=Geom.identity4();
@@ -97,22 +98,22 @@ public class ViewerPanel3D extends OpenGLPanel{
 		
 		
 		//Chargement des modèles 3D
-		models=new Vector<Model>();
+		models=new ArrayList<Model>();
 		
-		ball=new Model(Solide.lireFichierObj("./data/models/sphere.obj"), new Vertex(), 0);
+		ball=new Ball(Solide.lireFichierObj("./data/models/sphere.obj"), new Vector(), 0);
 		ball.getSolide().texturerAvec("./data/baseball.jpg");
 		ball.setScX(0.05);
 		ball.setScY(0.05);
 		ball.setScZ(0.05);
 		
-		Model table=new Model(Solide.lireFichierObj("./data/models/table.obj"), new Vertex(), 0);
-		table.getSolide().texturerAvec("./data/wood.jpg");
-		models.add(table);	
-		
-		//@TODO nombre de cans à gérer
-		Model can=new Model(Solide.lireFichierObj("./data/models/can.obj"), new Vertex(), 0);
-		can.getSolide().texturerAvec("./data/aluminium.jpg");
-		models.add(can);	
+//		Model table=new Model(Solide.lireFichierObj("./data/models/table.obj"), new Vector(), 0);
+//		table.getSolide().texturerAvec("./data/wood.jpg");
+//		models.add(table);	
+//		
+//		//@TODO nombre de cans à gérer
+//		Model can=new Model(Solide.lireFichierObj("./data/models/can.obj"), new Vector(), 0);
+//		can.getSolide().texturerAvec("./data/aluminium.jpg");
+//		models.add(can);	
 
 	}	
 
@@ -154,23 +155,12 @@ public class ViewerPanel3D extends OpenGLPanel{
 		gl.glEnable(GL2.GL_TEXTURE_2D);
 		
 		if(!ball.toAnimate){
-			pushMatrix();
-
-				gl.glLoadIdentity();
-				gl.glMultMatrixd(transf,0);
-				ball.dessine3DObj(gl);
-				
-			popMatrix();
-		}else{ //@TODO NE pas oublier d'animer le modèle à partir de ce moment là
-			pushMatrix();
-
-				gl.glLoadIdentity();
-				gl.glMultMatrixd(transfThrown,0);
-				ball.dessine3DObj(gl);
-				
-			popMatrix();
+			ball.dessine3DObj(gl);
+		}else{ 
+//			ball.setTransformation(transfThrown);
 		}
-		
+
+		ball.dessine3DObj(gl);
 		//dessin acteurs
 		for(Model a:models){
 			a.dessine3DObj(gl);

@@ -4,8 +4,8 @@ import edu.ufl.digitalworlds.j4k.DepthMap;
 import edu.ufl.digitalworlds.j4k.J4KSDK;
 import edu.ufl.digitalworlds.j4k.Skeleton;
 import edu.ufl.digitalworlds.math.Geom;
+import tridmodels.Model;
 import tridmodels.Vector;
-import tridmodels.primitives.Vertex;
 
 
 /*
@@ -48,7 +48,6 @@ public class Kinect extends J4KSDK{
 	float mem_sk[];
 	long timeSet;
 	double[] posBallStart;
-	Animator a;
 
 	public Kinect()
 	{
@@ -57,15 +56,12 @@ public class Kinect extends J4KSDK{
 		this.setNearMode(true);
 		mem_sk=new float[25*3];
 		posBallStart=new double[3];
-		a=new Animator(viewer);
-	}
-	
-	public void setAnimator(Animator a){
-		this.a=a;
 	}
 
 
-	public void setViewer(ViewerPanel3D viewer){this.viewer=viewer;}
+	public void setViewer(ViewerPanel3D viewer){
+		this.viewer=viewer;
+	}
 
 
 	@Override
@@ -120,14 +116,14 @@ public class Kinect extends J4KSDK{
 		if(angleArm>160 && !viewer.ball.toAnimate){
 			// calcul vitesse balle 
 			long time=timeSet-System.currentTimeMillis();
-			viewer.transfThrown=transf;
-			viewer.ball.setSpeed(new Vertex(
+			viewer.ball.setSpeed(new Vector(
 					Math.abs((transf[3]-posBallStart[0])/time),
 					Math.abs((transf[7]-posBallStart[1])/time),
 					Math.abs((transf[11]-posBallStart[2])/time)
 					));
 			
 			viewer.ball.toAnimate=true;
+			viewer.ball.setTransformation(transf);
 		}
 		if(angleArm<60){
 			timeSet=System.currentTimeMillis();
@@ -135,6 +131,7 @@ public class Kinect extends J4KSDK{
 			posBallStart[0]=transf[3];
 			posBallStart[1]=transf[7];
 			posBallStart[2]=transf[11];
+			viewer.ball.setSpeed(new Vector(0,0,0));
 		}
 	}
 
@@ -143,7 +140,11 @@ public class Kinect extends J4KSDK{
 		if(viewer==null || viewer.videoTexture==null) return;
 		viewer.videoTexture.update(getColorWidth(), getColorHeight(), data);
 		
-		a.animate();
+		if(viewer.ball!=null) if(viewer.ball.toAnimate) viewer.ball.animate();
+		
+		for(Model m:viewer.models){
+			m.animate();
+		}	
 	}
 
 	//Calcul des transformations

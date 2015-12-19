@@ -6,7 +6,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Vector;
+import java.util.ArrayList;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
@@ -17,25 +17,25 @@ import com.jogamp.opengl.util.texture.TextureIO;
 import tridmodels.primitives.Couleur;
 import tridmodels.primitives.Normal;
 import tridmodels.primitives.UVCoords;
-import tridmodels.primitives.Vertex;
+import tridmodels.Vector;
 
 
 public class Solide{
-	Vector<Polygone> polys;
+	ArrayList<Polygone> polys;
 	Integer glList;
 	private Integer texture;
 	private File textureFile;
 	private BoundingBox boundingBox;
 	
 	public Solide(){
-		polys=new Vector<Polygone>();
+		polys=new ArrayList<Polygone>();
 		glList=null;
 		texture=null;
 		textureFile=null;
 	}
 	
-	public Solide(Vertex position, Vector<Polygone> polys,double weight){
-		polys=new Vector<Polygone>();
+	public Solide(Vector position, ArrayList<Polygone> polys,double weight){
+		polys=new ArrayList<Polygone>();
 		glList=null;
 		texture=null;
 		textureFile=null;
@@ -91,10 +91,10 @@ public class Solide{
 		try {
 			BufferedReader br=new BufferedReader(new FileReader(fName));
 			String line;
-			Vector<double[]> vertice=new Vector<double[]>();
-			Vector<Normal> norms=new Vector<Normal>();
-			Vector<Integer[][]> faces=new Vector<Integer[][]>();
-			Vector<double[]> uv=new Vector<double[]>();
+			ArrayList<double[]> vertice=new ArrayList<double[]>();
+			ArrayList<Normal> norms=new ArrayList<Normal>();
+			ArrayList<Integer[][]> faces=new ArrayList<Integer[][]>();
+			ArrayList<double[]> uv=new ArrayList<double[]>();
 			
 			while((line=br.readLine())!=null){			
 				if(!line.startsWith("#")&& !line.isEmpty()){	
@@ -137,37 +137,37 @@ public class Solide{
 			for(int i=0; i<faces.size();i++){
 				Polygone p=new Polygone();
 				Integer[][]face=faces.get(i);
-				for(Integer[] vertex: face){
-					if(vertex[2]==null){
-						if(vertex[1]!=null){
-							double[] coord=uv.get((vertex[1]-1));
-							double[] v=vertice.get((vertex[0]-1));
+				for(Integer[] Vector: face){
+					if(Vector[2]==null){
+						if(Vector[1]!=null){
+							double[] coord=uv.get((Vector[1]-1));
+							double[] v=vertice.get((Vector[0]-1));
 							p.addElement(
-									new Vertex(v[0], v[1], v[2], new UVCoords(coord[0],coord[1])), 
+									new Vector(v[0], v[1], v[2], new UVCoords(coord[0],coord[1])), 
 									new Couleur(), 
 									new Normal());
 						}else{
-							double[] v=vertice.get((vertex[0]-1));
+							double[] v=vertice.get((Vector[0]-1));
 							p.addElement(
-									new Vertex(v[0], v[1], v[2]), 
+									new Vector(v[0], v[1], v[2]), 
 									new Couleur(), 
 									new Normal());							
 						}					
 					}else{
-						if(vertex[1]!=null){
-							double[] coord=uv.get((vertex[1]-1));
-							double[] v=vertice.get((vertex[0]-1));
+						if(Vector[1]!=null){
+							double[] coord=uv.get((Vector[1]-1));
+							double[] v=vertice.get((Vector[0]-1));
 							p.addElement(
-									new Vertex(v[0], v[1], v[2], new UVCoords(coord[0],coord[1])), 
+									new Vector(v[0], v[1], v[2], new UVCoords(coord[0],coord[1])), 
 									new Couleur(),
-									norms.get( (vertex[2]-1)));
+									norms.get( (Vector[2]-1)));
 							
 						}else{
-							double[] v=vertice.get((vertex[0]-1));
+							double[] v=vertice.get((Vector[0]-1));
 							p.addElement(
-									new Vertex(v[0], v[1], v[2]), 
+									new Vector(v[0], v[1], v[2]), 
 									new Couleur(), 
-									norms.get((vertex[2]-1)));
+									norms.get((Vector[2]-1)));
 						}
 					}
 				}
