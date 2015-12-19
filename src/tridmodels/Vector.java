@@ -44,7 +44,7 @@ public class Vector{
 		x=x+v.x;
 		y=y+v.y;
 		z=z+v.z;
-	}	
+	}
 	public UVCoords getUVCoord(){return  uv;}
 	public double[] getVertex(){return new double[]{x,y,z};}
 	public void setUVCoord(UVCoords n){ uv=n;}
@@ -54,4 +54,31 @@ public class Vector{
 	public void setX(double n){ x=n;}
 	public void setY(double n){ y=n;}
 	public void setZ(double n){ z=n;}
+	
+	/**
+	 * Returns the dot product of this Vector by another Vector
+	 * @param anotherVector
+	 * @return 
+	 */
+	public double dot(Vector anotherVector){
+		return x*anotherVector.x + y*anotherVector.y + z*anotherVector.z;
+	}
+	
+	/**
+	 * Returns the product of this Vector with another Vector
+	 * @param anotherVector
+	 * @return
+	 */
+	public Vector mult(Vector anotherVector){
+		return new Vector(x*anotherVector.x, y*anotherVector.y, z*anotherVector.z);
+	}
+	
+	/**
+	 * Returns the product of this Vector by a number.
+	 * @param number the number to multiply this Vector with
+	 * @return a new Vector, with its coefficients being this coefficients, multiplied by the number
+	 */
+	public Vector mult(double number){
+		return new Vector(x*number, y*number, z*number);
+	}
 }
