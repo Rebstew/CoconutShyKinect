@@ -81,4 +81,38 @@ public class Vector{
 	public Vector mult(double number){
 		return new Vector(x*number, y*number, z*number);
 	}
+	
+	/**
+	 * Returns the normalized version of this vector
+	 * @return a new Vector, with its coefficients belonging to [-1, 1]
+	 */
+	public Vector normalize(){
+		return new Vector(x/length(), y/length(), z/length());
+	}
+	
+	/**
+	 * Returns the length of this vector
+	 * @return length of the vector
+	 */
+	public double length(){
+		return Math.sqrt((x*x)+(y*y)+(z*z));
+	}
+	
+	/**
+	 * Returns the sum of this Vector and another Vector
+	 * @param anotherVector the vector to be added
+	 * @return a new Vector, being the sum of the two Vectors' coefficients
+	 */
+	public Vector add(Vector anotherVector){
+		return new Vector(x+anotherVector.x, y+anotherVector.y, z+anotherVector.z);
+	}
+	
+	/**
+	 * Returns the difference of this Vector and another Vector
+	 * @param anotherVector the vector to be substracted
+	 * @return a new Vector, being the difference of the two Vectors' coefficients
+	 */
+	public Vector sub(Vector anotherVector){
+		return new Vector(x-anotherVector.x, y-anotherVector.y, z-anotherVector.z);
+	}
 }
