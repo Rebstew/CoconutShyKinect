@@ -104,35 +104,31 @@ public class Kinect extends J4KSDK{
 			double hr[]=found.get3DJoint(Skeleton.WRIST_RIGHT);
 			double kr[]=found.get3DJoint(Skeleton.HAND_RIGHT);
 			transformBody4(-hr[0],hr[1],-hr[2],-kr[0],kr[1],-kr[2],	-nrm[0],nrm[1],nrm[2],transf,inv_transf);
-			viewer.transf=transf;
-			viewer.inv_transf=inv_transf;
 		//FIN DE LA SORCELLERIE
 
 		double[]v1=found.get3DJoint(Skeleton.SHOULDER_RIGHT);
 		double[]v2=found.get3DJoint(Skeleton.ELBOW_RIGHT);
 		double[]v3=found.get3DJoint(Skeleton.HAND_RIGHT);
 		double angleArm=Math.abs(new Vector(v3[0]-v2[0], v3[1]-v2[1], v3[2]-v2[2]).angleWith(new Vector(v1[0]-v2[0], v1[1]-v2[1], v1[2]-v2[2])));
-				
-		if(angleArm>160 && !viewer.ball.toAnimate){
-			// calcul vitesse balle 
-			long time=timeSet-System.currentTimeMillis();
-			viewer.ball.setSpeed(new Vector(
-					Math.abs((transf[3]-posBallStart[0])/time),
-					Math.abs((transf[7]-posBallStart[1])/time),
-					Math.abs((transf[11]-posBallStart[2])/time)
-					));
-			
-			viewer.ball.toAnimate=true;
-			viewer.ball.setTransformation(transf);
-		}
+
 		if(angleArm<60){
 			timeSet=System.currentTimeMillis();
 			viewer.ball.toAnimate=false;
-			posBallStart[0]=transf[3];
-			posBallStart[1]=transf[7];
-			posBallStart[2]=transf[11];
+			posBallStart[0]=transf[12];
+			posBallStart[1]=transf[13];
+			posBallStart[2]=transf[14];
 			viewer.ball.setSpeed(new Vector(0,0,0));
-		}
+			viewer.ball.setTransformation(transf);
+		}else if(angleArm>160 && !viewer.ball.toAnimate){
+			// calcul vitesse balle 
+			long time=timeSet-System.currentTimeMillis();
+			viewer.ball.setSpeed(new Vector(
+					Math.abs((transf[12]-posBallStart[0])/time),
+					Math.abs((transf[13]-posBallStart[1])/time),
+					Math.abs((transf[14]-posBallStart[2])/time)));
+			viewer.ball.toAnimate=true;
+			System.out.println("Coord: x:"+transf[12]+" y:"+transf[13]+" z:"+transf[14]);
+		}else if(!viewer.ball.toAnimate) viewer.ball.setTransformation(transf);
 	}
 
 	@Override

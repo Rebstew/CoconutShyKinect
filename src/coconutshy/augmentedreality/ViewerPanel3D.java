@@ -8,6 +8,8 @@ import javax.media.opengl.GL2;
 import edu.ufl.digitalworlds.math.Geom;
 import edu.ufl.digitalworlds.opengl.OpenGLPanel;
 import tridmodels.Ball;
+import tridmodels.Box;
+import tridmodels.Can;
 import tridmodels.Model;
 import tridmodels.Solide;
 import tridmodels.Vector;
@@ -59,9 +61,6 @@ public class ViewerPanel3D extends OpenGLPanel{
 	ArrayList<Model> models;
 
 	Skeleton skeleton;
-	double transf[]=Geom.identity4();
-	double inv_transf[]=Geom.identity4();
-	double[] transfThrown;
 
 	DepthMap current_map=null;
 	VideoFrame videoTexture;
@@ -102,18 +101,23 @@ public class ViewerPanel3D extends OpenGLPanel{
 		
 		ball=new Ball(Solide.lireFichierObj("./data/models/sphere.obj"), new Vector(), 0);
 		ball.getSolide().texturerAvec("./data/baseball.jpg");
-		ball.setScX(0.05);
-		ball.setScY(0.05);
-		ball.setScZ(0.05);
+		ball.setScale(0.05,0.05,0.05);
 		
-//		Model table=new Model(Solide.lireFichierObj("./data/models/table.obj"), new Vector(), 0);
-//		table.getSolide().texturerAvec("./data/wood.jpg");
-//		models.add(table);	
+		Box table=new Box(Solide.lireFichierObj("./data/models/table.obj"), new Vector(-5, -2.2, -13), 0);
+		table.getSolide().texturerAvec("./data/wood.jpg");
+		double[] tr=table.getTransformation();
+//		tr[8]=-1.16;
+		table.setScale(0.15,0.3,0.5);
+		models.add(table);	
 //		
-//		//@TODO nombre de cans à gérer
-//		Model can=new Model(Solide.lireFichierObj("./data/models/can.obj"), new Vector(), 0);
-//		can.getSolide().texturerAvec("./data/aluminium.jpg");
-//		models.add(can);	
+		//TODO nombre de cans à gérer
+		Can can;
+		for(int i=0; i<3; i++){
+			can=new Can(Solide.lireFichierObj("./data/models/can.obj"), new Vector(-4.3,-1.2,-13+(0.9*i)), 0);
+			can.getSolide().texturerAvec("./data/aluminium.jpg");
+			can.setScale(0.1,0.12,0.1);
+			models.add(can);
+		}
 
 	}	
 
@@ -149,19 +153,11 @@ public class ViewerPanel3D extends OpenGLPanel{
 			}
 		}
 
-		//dessin scène
-		
+		//dessin scène		
 		gl.glEnable(GL2.GL_LIGHTING);
 		gl.glEnable(GL2.GL_TEXTURE_2D);
-		
-		if(!ball.toAnimate){
-			ball.dessine3DObj(gl);
-		}else{ 
-//			ball.setTransformation(transfThrown);
-		}
-
-		ball.dessine3DObj(gl);
 		//dessin acteurs
+		ball.dessine3DObj(gl);
 		for(Model a:models){
 			a.dessine3DObj(gl);
 		}
@@ -169,15 +165,13 @@ public class ViewerPanel3D extends OpenGLPanel{
 
 	private void background(GL2 gl) {				
 		pushMatrix(); 
-
-		gl.glDisable(GL2.GL_LIGHTING);
-		gl.glEnable(GL2.GL_TEXTURE_2D);
-		gl.glColor3f(1f,1f,1f);
-		videoTexture.use(gl);
-		translate(0,0,-2.2);
-		rotateZ(180);
-		image(8.0/3.0,2);
-
+			gl.glDisable(GL2.GL_LIGHTING);
+			gl.glEnable(GL2.GL_TEXTURE_2D);
+			gl.glColor3f(1f,1f,1f);
+			videoTexture.use(gl);
+			translate(0,0,-2.2);
+			rotateZ(180);
+			image(8.0/3.0,2);
 		popMatrix();
 	}
 

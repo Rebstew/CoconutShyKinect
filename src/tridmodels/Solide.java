@@ -137,37 +137,37 @@ public class Solide{
 			for(int i=0; i<faces.size();i++){
 				Polygone p=new Polygone();
 				Integer[][]face=faces.get(i);
-				for(Integer[] Vector: face){
-					if(Vector[2]==null){
-						if(Vector[1]!=null){
-							double[] coord=uv.get((Vector[1]-1));
-							double[] v=vertice.get((Vector[0]-1));
+				for(Integer[] vertex: face){
+					if(vertex[2]==null){
+						if(vertex[1]!=null){
+							double[] coord=uv.get((vertex[1]-1));
+							double[] v=vertice.get((vertex[0]-1));
 							p.addElement(
 									new Vector(v[0], v[1], v[2], new UVCoords(coord[0],coord[1])), 
 									new Couleur(), 
 									new Normal());
 						}else{
-							double[] v=vertice.get((Vector[0]-1));
+							double[] v=vertice.get((vertex[0]-1));
 							p.addElement(
 									new Vector(v[0], v[1], v[2]), 
 									new Couleur(), 
 									new Normal());							
 						}					
 					}else{
-						if(Vector[1]!=null){
-							double[] coord=uv.get((Vector[1]-1));
-							double[] v=vertice.get((Vector[0]-1));
+						if(vertex[1]!=null){
+							double[] coord=uv.get((vertex[1]-1));
+							double[] v=vertice.get((vertex[0]-1));
 							p.addElement(
 									new Vector(v[0], v[1], v[2], new UVCoords(coord[0],coord[1])), 
 									new Couleur(),
-									norms.get( (Vector[2]-1)));
+									norms.get( (vertex[2]-1)));
 							
 						}else{
-							double[] v=vertice.get((Vector[0]-1));
+							double[] v=vertice.get((vertex[0]-1));
 							p.addElement(
 									new Vector(v[0], v[1], v[2]), 
 									new Couleur(), 
-									norms.get((Vector[2]-1)));
+									norms.get((vertex[2]-1)));
 						}
 					}
 				}

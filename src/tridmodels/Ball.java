@@ -13,9 +13,9 @@ public class Ball extends Model {
 		double[] pos=this.getTransformation();
 		Vector speed=this.getSpeed();
 
-		pos[3]=pos[3]*speed.getX()*COEF_BALL_SPEED;
-		pos[7]=pos[7]*speed.getY()*COEF_BALL_SPEED;
-		pos[11]=pos[11]*speed.getZ()*COEF_BALL_SPEED;	
+		pos[12]=pos[12]*speed.getX()*COEF_BALL_SPEED;
+		pos[13]=pos[13]*speed.getY()*COEF_BALL_SPEED;
+		pos[14]=pos[14]*speed.getZ()*COEF_BALL_SPEED;	
 		this.setTransformation(pos);
 	}
 
