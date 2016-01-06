@@ -2,11 +2,9 @@ package tridmodels;
 
 import javax.media.opengl.GL2;
 
-import edu.ufl.digitalworlds.math.Geom;
 import tridmodels.Vector;
 
 public class Ball extends Model {
-	private static final double COEF_BALL_SPEED=-30;
 	int angle_rot=0;
 
 	public Ball(Solide s, Vector position, double weight) {
@@ -19,7 +17,7 @@ public class Ball extends Model {
 
 		gl.glLoadIdentity();
 		gl.glMultMatrixd(this.getTransformation(),0);
-		
+
 		//rotate
 		gl.glRotated(angle_rot, 1, 2, 0.5);
 		//scale
@@ -28,14 +26,26 @@ public class Ball extends Model {
 		gl.glPopMatrix();
 	}
 	public void animate(){
-		double[] pos=this.getTransformation();
-		Vector speed=this.getSpeed();
-		pos[12]=pos[12]+(speed.getX()*COEF_BALL_SPEED);
-		pos[13]=pos[13]+(speed.getY()*COEF_BALL_SPEED);
-		pos[14]=pos[14]-(speed.getZ()*COEF_BALL_SPEED);	
-		
-		angle_rot+=20;
-		this.setTransformation(pos);
+		if(this.toAnimate){
+			System.out.println("animate ball");
+			
+			double[] pos=this.getTransformation();
+			System.out.println("pos: "+pos[12]+", "+pos[13]+", "+pos[14]);
+			System.out.println("Vitesse: "+getSpeed());
+			System.out.println("Acceleration: "+getAcceleration());
+			
+			//gravité
+			eulerIntegrate();
+			
+			//application de la vitesse
+			Vector speed=this.getSpeed();
+			pos[12]=pos[12]+(speed.getX()*dt);
+			pos[13]=pos[13]+(speed.getY()*dt);
+			pos[14]=pos[14]+(speed.getZ()*dt);	
+
+			angle_rot+=20;
+			this.setTransformation(pos);
+		}
 	}
 
 }

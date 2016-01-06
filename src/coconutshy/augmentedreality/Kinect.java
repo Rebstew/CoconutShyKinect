@@ -122,12 +122,13 @@ public class Kinect extends J4KSDK{
 			viewer.ball.setTransformation(transf);
 		}else if(angleArm>150 && !viewer.ball.toAnimate){
 			// calcul vitesse balle 
-			long time=timeSet-System.currentTimeMillis();
+			float time=(timeSet-System.currentTimeMillis())/1000f;
 			viewer.ball.setSpeed(new Vector(
-					Math.abs((transf[12]-posBallStart[0])/time),
-					Math.abs((transf[13]-posBallStart[1])/time),
-					Math.abs((transf[14]-posBallStart[2])/time)));
-			viewer.ball.setAcceleration(new Vector(0,9.81d, 0));
+					(posBallStart[0]-transf[12])/time,
+					(posBallStart[1]-transf[13])/time,
+					(posBallStart[2]-transf[14])/time));
+			System.out.println("Vitesse au lancé: "+viewer.ball.getSpeed());
+			viewer.ball.setAcceleration(new Vector(0,-9.81d, 0));
 			viewer.ball.toAnimate=true;
 		}else if(!viewer.ball.toAnimate) viewer.ball.setTransformation(transf);
 	}
@@ -136,13 +137,6 @@ public class Kinect extends J4KSDK{
 	public void onColorFrameEvent(byte[] data) {
 		if(viewer==null || viewer.videoTexture==null) return;
 		viewer.videoTexture.update(getColorWidth(), getColorHeight(), data);
-		
-		if(viewer.ball!=null){
-			if(viewer.ball.toAnimate){
-				viewer.ball.animate();
-			}
-		}
-		
 		
 		viewer.animationLoop();
 	}

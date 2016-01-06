@@ -193,7 +193,7 @@ public class ViewerPanel3D extends OpenGLPanel{
 	}
 	
 	public void animationLoop(){
-		checkCollisions();
+//		checkCollisions();
 		animate();
 	}
 	

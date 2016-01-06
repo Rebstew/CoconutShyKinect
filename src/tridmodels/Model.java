@@ -12,7 +12,7 @@ import tridmodels.Vector;
  */
 
 public abstract class Model {
-	public static double dt = (1/24d);
+	public static double dt = (1/48d);
 	double scX=1,scY=1,scZ=1;
 
 	public boolean toAnimate=false;
@@ -22,7 +22,7 @@ public abstract class Model {
 	private BoundingBox boundingBox;
 	private double weight;
 	private final double MAX_VELOCITY = 10;
-	private final Vector GRAVITY = new Vector(0,-9.81, 0);
+	private final Vector GRAVITY = new Vector(0,9.81, 0);
 	private double[] transf;
 
 	public Model(Solide s,Vector position, double weight){
@@ -129,17 +129,25 @@ public abstract class Model {
 	}
 	
 	public void eulerIntegrate(){
-		speed.x += acceleration.x*dt;
-		speed.y += acceleration.y*dt;
-		speed.z += acceleration.z*dt;
+		System.out.println("integration, pas = "+dt);
+//		speed.x += acceleration.x*dt;
+//		speed.y += acceleration.y*dt;
+//		speed.z += acceleration.z*dt;
+		Vector a=getAcceleration();
+		Vector s=getSpeed();
+		setSpeed(new Vector(s.getX()+(a.getX()*dt),s.getY()+(a.getY()*dt),s.getZ()+(a.getZ()*dt)));
 		
-		if(Math.abs(speed.y) < 0.01){
-			speed.y=0;
-		}
+//		if(Math.abs(speed.y) < 0.01){
+//			speed.y=0;
+//		}
+
+//		double[] pos=this.getTransformation();
+//		pos[12]=pos[12]+(speed.getX()*100*dt);
+//		pos[13]= pos[12]+(speed.getY()*dt);
+//		pos[14]= pos[12]+(speed.getZ()*dt);
+//		
+//		this.setTransformation(pos);
 		
-		position.x+= speed.x*dt;
-		position.y+= speed.y*dt;
-		position.z+= speed.z*dt;
 	}
 
 }
