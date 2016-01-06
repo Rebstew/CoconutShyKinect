@@ -108,9 +108,8 @@ public class ViewerPanel3D extends OpenGLPanel{
 		double[] tr=table.getTransformation();
 //		tr[8]=-1.16;
 		table.setScale(0.15,0.3,0.5);
-		models.add(table);	
-//		
-		//TODO nombre de cans à gérer
+		models.add(table);
+		
 		Can can;
 		for(int i=0; i<3; i++){
 			can=new Can(Solide.lireFichierObj("./data/models/can.obj"), new Vector(-4.3,-1.2,-13+(0.9*i)), 0);
