@@ -118,6 +118,7 @@ public class Kinect extends J4KSDK{
 			posBallStart[1]=transf[13];
 			posBallStart[2]=transf[14];
 			viewer.ball.setSpeed(new Vector(0,0,0));
+			
 			viewer.ball.setTransformation(transf);
 		}else if(angleArm>150 && !viewer.ball.toAnimate){
 			// calcul vitesse balle 
@@ -126,6 +127,7 @@ public class Kinect extends J4KSDK{
 					Math.abs((transf[12]-posBallStart[0])/time),
 					Math.abs((transf[13]-posBallStart[1])/time),
 					Math.abs((transf[14]-posBallStart[2])/time)));
+			viewer.ball.setAcceleration(new Vector(0,9.81d, 0));
 			viewer.ball.toAnimate=true;
 		}else if(!viewer.ball.toAnimate) viewer.ball.setTransformation(transf);
 	}
@@ -141,9 +143,8 @@ public class Kinect extends J4KSDK{
 			}
 		}
 		
-		for(Model m:viewer.models){
-			m.animate();
-		}	
+		
+		viewer.animationLoop();
 	}
 
 	//Calcul des transformations

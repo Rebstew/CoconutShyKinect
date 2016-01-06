@@ -108,6 +108,7 @@ public class ViewerPanel3D extends OpenGLPanel{
 		double[] tr=table.getTransformation();
 //		tr[8]=-1.16;
 		table.setScale(0.15,0.3,0.5);
+		models.add(ball);
 		models.add(table);
 		
 		Can can;
@@ -156,7 +157,7 @@ public class ViewerPanel3D extends OpenGLPanel{
 		gl.glEnable(GL2.GL_LIGHTING);
 		gl.glEnable(GL2.GL_TEXTURE_2D);
 		//dessin acteurs
-		ball.dessine3DObj(gl);
+		//ball.dessine3DObj(gl);
 		for(Model a:models){
 			a.dessine3DObj(gl);
 		}
@@ -189,5 +190,31 @@ public class ViewerPanel3D extends OpenGLPanel{
 			if(mode<3) mode=5;
 		}
 
+	}
+	
+	public void animationLoop(){
+		checkCollisions();
+		animate();
+	}
+	
+	public void checkCollisions(){
+		//dichotomic check
+				for(int i=0; i<models.size(); i++){
+					for(int j=i+1; j<models.size(); j++){
+						if(models.get(i).collidesWith(models.get(j))){
+							collide(models.get(i), models.get(j));
+						}
+					}
+				}
+	}
+	
+	public void animate(){
+		for(Model m : models){
+			m.animate();
+		}
+	}
+	
+	public void collide(Model m1, Model m2){
+		//TODO collision balle boite/ boite boite / table boite / table balle
 	}
 }

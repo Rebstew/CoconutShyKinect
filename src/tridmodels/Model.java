@@ -12,12 +12,13 @@ import tridmodels.Vector;
  */
 
 public abstract class Model {
+	public static double dt = (1/24d);
 	double scX=1,scY=1,scZ=1;
 
 	public boolean toAnimate=false;
 
 	private Solide solide;
-	private Vector speed, acceleration;
+	private Vector speed, acceleration, position;
 	private BoundingBox boundingBox;
 	private double weight;
 	private final double MAX_VELOCITY = 10;
@@ -26,6 +27,7 @@ public abstract class Model {
 
 	public Model(Solide s,Vector position, double weight){
 		transf=Geom.identity4();
+		this.position = position;
 		transf[12]=position.getX();
 		transf[13]=position.getY();
 		transf[14]=position.getZ();
@@ -34,6 +36,7 @@ public abstract class Model {
 		solide= s;
 		this.setWeight(weight);
 	}
+	
 	//detection collision avec voisins
 	//si boite, boite tombe pas toute seule
 	//bouge
@@ -72,15 +75,6 @@ public abstract class Model {
 				&& boundingBox.minY < boundingBox2.maxY
 				&& boundingBox.maxZ > boundingBox2.minZ
 				&& boundingBox.minZ < boundingBox2.maxZ);
-	}
-
-	/**
-	 * Returns 3d angle of the collision between this and another model
-	 * @param anotherModel
-	 * @return
-	 */
-	public double getCollisionAngleWith(Model anotherModel){
-		return 0.0;
 	}
 
 	public Vector getSpeed() {
@@ -122,13 +116,30 @@ public abstract class Model {
 	public void setTransformation(double[] transfThrown) {
 		this.transf=transfThrown;
 
-	}public double[] getTransformation() {
+	}
+	
+	public double[] getTransformation() {
 		return transf;
 	}
+	
 	public void setScale(double d, double e, double f) {
 		scX=d;
 		scY=e;
 		scZ=f;		
+	}
+	
+	public void eulerIntegrate(){
+		speed.x += acceleration.x*dt;
+		speed.y += acceleration.y*dt;
+		speed.z += acceleration.z*dt;
+		
+		if(Math.abs(speed.y) < 0.01){
+			speed.y=0;
+		}
+		
+		position.x+= speed.x*dt;
+		position.y+= speed.y*dt;
+		position.z+= speed.z*dt;
 	}
 
 }
