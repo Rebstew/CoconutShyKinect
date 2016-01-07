@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLException;
@@ -25,7 +26,6 @@ public class Solide{
 	Integer glList;
 	private Integer texture;
 	private File textureFile;
-	private BoundingBox boundingBox;
 	
 	public Solide(){
 		polys=new ArrayList<Polygone>();
@@ -34,8 +34,8 @@ public class Solide{
 		textureFile=null;
 	}
 	
-	public Solide(Vector position, ArrayList<Polygone> polys,double weight){
-		polys=new ArrayList<Polygone>();
+	public Solide(ArrayList<Polygone> p){
+		this.polys=p;
 		glList=null;
 		texture=null;
 		textureFile=null;
@@ -179,5 +179,33 @@ public class Solide{
 		}
 		return res;
 		
+	}
+
+	public Solide getUpperLimitPlane() {
+		double[] centre=calculeCentre();
+		ArrayList<Vector> vertice=new ArrayList<Vector>();
+		for(Polygone p:this.polys){
+			vertice.addAll(p.getVertice());
+		}		
+		vertice.sort(new Comparator<Vector>() {
+			public int compare(Vector o1, Vector o2) {
+				double d=Math.sqrt(Math.pow(o1.x-centre[0],2)+Math.pow(o1.y-centre[1],2)+Math.pow(o1.z-centre[2],2));
+				double d2=Math.sqrt(Math.pow(o2.x-centre[0],2)+Math.pow(o2.y-centre[1],2)+Math.pow(o2.z-centre[2],2));
+				if(d-d2 != 0) return d>d2 ? 1 : -1;
+				else{
+					if(o1.y-o2.y==0) return 0;
+					else return o1.y>o2.y ? 1 : -1;
+				}
+			};
+		});		
+		Polygone plane=new Polygone();
+		plane.addElement(vertice.get(0), new Couleur(), new Normal(0, 1, 0));
+		plane.addElement(vertice.get(1), new Couleur(), new Normal(0, 1, 0));
+		plane.addElement(vertice.get(2), new Couleur(), new Normal(0, 1, 0));
+		plane.addElement(vertice.get(3), new Couleur(), new Normal(0, 1, 0));
+		
+		ArrayList<Polygone> surface=new ArrayList<Polygone>();
+		surface.add(plane);
+		return new Solide(surface);
 	}
 }

@@ -8,7 +8,7 @@ import javax.media.opengl.GL2;
 import edu.ufl.digitalworlds.math.Geom;
 import edu.ufl.digitalworlds.opengl.OpenGLPanel;
 import tridmodels.Ball;
-import tridmodels.Box;
+import tridmodels.Table;
 import tridmodels.Can;
 import tridmodels.Model;
 import tridmodels.Solide;
@@ -103,7 +103,7 @@ public class ViewerPanel3D extends OpenGLPanel{
 		ball.getSolide().texturerAvec("./data/baseball.jpg");
 		ball.setScale(0.05,0.05,0.05);
 		
-		Box table=new Box(Solide.lireFichierObj("./data/models/table.obj"), new Vector(-5, -2.2, -13), 0);
+		Table table=new Table(Solide.lireFichierObj("./data/models/table.obj"), new Vector(-5, -2.2, -13), 0);
 		table.getSolide().texturerAvec("./data/wood.jpg");
 		double[] tr=table.getTransformation();
 //		tr[8]=-1.16;
