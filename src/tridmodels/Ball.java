@@ -9,6 +9,7 @@ public class Ball extends Model {
 
 	public Ball(Solide s, Vector position, double weight) {
 		super(s, position, weight);
+		//TODO Set boundingbox
 	}
 	@Override
 	public void dessine3DObj(GL2 gl){
@@ -27,12 +28,12 @@ public class Ball extends Model {
 	}
 	public void animate(){
 		if(this.toAnimate){
-			System.out.println("animate ball");
+//			System.out.println("animate ball");
 			
 			double[] pos=this.getTransformation();
-			System.out.println("pos: "+pos[12]+", "+pos[13]+", "+pos[14]);
-			System.out.println("Vitesse: "+getSpeed());
-			System.out.println("Acceleration: "+getAcceleration());
+//			System.out.println("pos: "+pos[12]+", "+pos[13]+", "+pos[14]);
+//			System.out.println("Vitesse: "+getSpeed());
+//			System.out.println("Acceleration: "+getAcceleration());
 			
 			//gravité
 			eulerIntegrate();

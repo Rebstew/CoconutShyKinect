@@ -29,7 +29,7 @@ public class Table extends Model {
 		gl.glScaled(scX, scY, scZ);
 		this.getSolide().dessin_OpenGL(gl);
 		gl.glPushMatrix();
-			gl.glTranslated(0, 4, 0);
+			gl.glTranslated(0, 0.5, 0);
 			if(drawCollisionP) this.collisionPlane.dessin_OpenGL(gl);
 		gl.glPopMatrix();
 		gl.glPopMatrix();

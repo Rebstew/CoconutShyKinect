@@ -124,9 +124,9 @@ public class Kinect extends J4KSDK{
 			// calcul vitesse balle 
 			float time=(timeSet-System.currentTimeMillis())/1000f;
 			viewer.ball.setSpeed(new Vector(
-					(posBallStart[0]-transf[12])/time,
-					(posBallStart[1]-transf[13])/time,
-					(posBallStart[2]-transf[14])/time));
+					(posBallStart[0]-transf[12])*2/time,
+					(posBallStart[1]-transf[13])*2/time,
+					(posBallStart[2]-transf[14])*2/time));
 			System.out.println("Vitesse au lancé: "+viewer.ball.getSpeed());
 			viewer.ball.setAcceleration(new Vector(0,-9.81d, 0));
 			viewer.ball.toAnimate=true;

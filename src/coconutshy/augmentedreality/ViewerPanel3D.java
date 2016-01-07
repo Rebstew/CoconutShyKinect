@@ -103,19 +103,19 @@ public class ViewerPanel3D extends OpenGLPanel{
 		ball.getSolide().texturerAvec("./data/baseball.jpg");
 		ball.setScale(0.05,0.05,0.05);
 		
-		Table table=new Table(Solide.lireFichierObj("./data/models/table.obj"), new Vector(-5, -2.2, -13), 0);
+		Table table=new Table(Solide.lireFichierObj("./data/models/table.obj"), new Vector(-0.4, -0.2, -1), 0);
 		table.getSolide().texturerAvec("./data/wood.jpg");
 		double[] tr=table.getTransformation();
 //		tr[8]=-1.16;
-		table.setScale(0.15,0.3,0.5);
+		table.setScale(0.03,0.03,0.1);
 		models.add(ball);
 		models.add(table);
 		
 		Can can;
 		for(int i=0; i<3; i++){
-			can=new Can(Solide.lireFichierObj("./data/models/can.obj"), new Vector(-4.3,-1.2,-13+(0.9*i)), 0);
+			can=new Can(Solide.lireFichierObj("./data/models/can.obj"), new Vector(-0.2,-0.09,-0.9+(0.1*i)), 0);
 			can.getSolide().texturerAvec("./data/aluminium.jpg");
-			can.setScale(0.1,0.12,0.1);
+			can.setScale(0.01,0.011,0.01);
 			models.add(can);
 		}
 
@@ -193,7 +193,7 @@ public class ViewerPanel3D extends OpenGLPanel{
 	}
 	
 	public void animationLoop(){
-		checkCollisions();
+//		TODO créer des boundingbox avant checkCollisions();
 		animate();
 	}
 	

@@ -5,7 +5,8 @@ import javax.media.opengl.GL2;
 public class Can extends Model {
 	
 	public Can(Solide s, Vector vector, int i){
-		super(s, vector, i);		
+		super(s, vector, i);	
+		//TODO Set boundingbox	
 	}
 	@Override
 	public void dessine3DObj(GL2 gl){

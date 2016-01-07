@@ -153,7 +153,7 @@ public abstract class Model {
 	}
 	
 	public void eulerIntegrate(){
-		System.out.println("integration, pas = "+dt);
+//		System.out.println("integration, pas = "+dt);
 //		speed.x += acceleration.x*dt;
 //		speed.y += acceleration.y*dt;
 //		speed.z += acceleration.z*dt;
