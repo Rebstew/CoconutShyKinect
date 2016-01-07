@@ -193,7 +193,7 @@ public class ViewerPanel3D extends OpenGLPanel{
 	}
 	
 	public void animationLoop(){
-//		checkCollisions();
+		checkCollisions();
 		animate();
 	}
 	
@@ -216,5 +216,26 @@ public class ViewerPanel3D extends OpenGLPanel{
 	
 	public void collide(Model m1, Model m2){
 		//TODO collision balle boite/ boite boite / table boite / table balle
+		//collision entre deux objets soumis à la gravité
+		
+		double bounce = Math.min(m1.getE(), m2.getE());
+	  
+	  //sep = vecteur dir entre deux centres
+	  Vector sep = (m1.getPosition().sub(m2.getPosition()));
+	  
+	  // dr = ce vecteur normalisé
+	  Vector dr = sep.normalize();
+	  
+	  //vcm = somme des moments / masse
+	  Vector vcm = ((m1.getSpeed().mult(m1.getWeight()).add(m2.getSpeed().mult(m2.getWeight())))).mult( 1/ (m1.getWeight() + m2.getWeight()));
+	  
+	  Vector p1 = (m2.getSpeed().sub(vcm)).mult(m2.getWeight());
+	  Vector p1dir = p1.normalize();
+	  double p1len = p1.length();
+	  
+	  Vector newp1 = (p1dir.sub( (dr.mult(2.0).mult(p1dir.dot(dr)))).mult(p1len).mult( bounce));
+	  
+	  m1.setSpeed(newp1.mult(-1).mult(m1.getWeight()).add(vcm));
+	  m2.setSpeed((newp1.mult(1/m2.getWeight())).add(vcm));
 	}
 }

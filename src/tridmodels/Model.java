@@ -18,16 +18,37 @@ public abstract class Model {
 	public boolean toAnimate=false;
 
 	private Solide solide;
+	
+	/**
+	 * Used to make euler integration, modified on collisions
+	 */
 	private Vector speed, acceleration, position;
+	
+	/**
+	 * Used to detect collisions
+	 */
 	private BoundingBox boundingBox;
+	
+	/**
+	 * Mass of model, used for collisions
+	 */
 	private double weight;
 	private final double MAX_VELOCITY = 10;
 	private final Vector GRAVITY = new Vector(0,9.81, 0);
+	
+	/**
+	 * Used to draw the model on the screen
+	 */
 	private double[] transf;
+	
+	/**
+	 * Elasticity coefficient
+	 */
+	private double e;
 
 	public Model(Solide s,Vector position, double weight){
 		transf=Geom.identity4();
-		this.position = position;
+		this.setPosition(position);
 		transf[12]=position.getX();
 		transf[13]=position.getY();
 		transf[14]=position.getZ();
@@ -35,6 +56,9 @@ public abstract class Model {
 		this.acceleration = new Vector(0,0,0);
 		solide= s;
 		this.setWeight(weight);
+		
+		//default is perfectly elastic collision
+		this.e = 1d;
 	}
 	
 	//detection collision avec voisins
@@ -148,6 +172,18 @@ public abstract class Model {
 //		
 //		this.setTransformation(pos);
 		
+	}
+
+	public Vector getPosition() {
+		return position;
+	}
+
+	public void setPosition(Vector position) {
+		this.position = position;
+	}
+	
+	public double getE(){
+		return e;
 	}
 
 }
