@@ -59,6 +59,8 @@ public abstract class Model {
 		
 		//default is perfectly elastic collision
 		this.e = 1d;
+		
+		createBoundingBox();
 	}
 	
 	//detection collision avec voisins
@@ -121,8 +123,27 @@ public abstract class Model {
 		return boundingBox;
 	}
 
-	public void setBoundingBox(BoundingBox boundingBox) {
-		this.boundingBox = boundingBox;
+	public void createBoundingBox() {
+		
+		Vector min = null , max = null;
+		
+		for(Polygone p : solide.polys){
+			//init
+			if(min == null && max == null){
+				min = max = p.vertice.get(0);
+			} else {
+				for(Vector v : p.vertice){
+					if(v.x <= min.x && v.y <= min.y && v.z <= min.z){
+						min = v;
+					} else if(v.x >= max.x && v.y >= max.y && v.z >= max.z){
+						max = v;
+					}
+				}
+			}	
+		}
+		
+		this.boundingBox = new BoundingBox(min, max);
+		
 	}
 
 	public double getWeight() {

@@ -208,4 +208,5 @@ public class Solide{
 		surface.add(plane);
 		return new Solide(surface);
 	}
+	
 }
